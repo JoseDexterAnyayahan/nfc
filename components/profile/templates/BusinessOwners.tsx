@@ -56,26 +56,41 @@ function escapeVCardValue(value: string) {
     .replace(/\r?\n/g, "\\n");
 }
 
-async function imageToBase64(src: string) {
-  try {
-    const response = await fetch(src);
-    const blob = await response.blob();
+const imageToBase64 = async (
+  src: string,
+): Promise<{ base64: string; type: string } | null> => {
+  const response = await fetch(src);
 
-    return await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        resolve(result.split(",")[1] || "");
-      };
-
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  } catch {
-    return "";
+  if (!response.ok) {
+    throw new Error(`Failed to fetch image: ${response.status}`);
   }
-}
+
+  const blob = await response.blob();
+
+  const base64 = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      const result = reader.result as string;
+
+      // Remove: data:image/png;base64,
+      // leaving only the actual Base64 content.
+      const encoded = result.split(",")[1];
+
+      resolve(encoded);
+    };
+
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+
+  const type = blob.type.split("/").pop()?.toUpperCase() || "PNG";
+
+  return {
+    base64,
+    type,
+  };
+};
 
 /* ============================================================
    SOCIAL ICON
@@ -218,65 +233,61 @@ export default function BusinessOwners({
   ============================================================ */
 
   const handleSaveContact = async () => {
-    let photo = "";
+    const imageSource = data.banner || data.avatar || data.logo;
 
-    if (data.logo) {
-      photo = await imageToBase64(data.logo);
+    let photoBase64 = "";
+    let photoType = "PNG";
+
+    if (imageSource) {
+      try {
+        const result = await imageToBase64(imageSource);
+
+        if (result) {
+          photoBase64 = result.base64;
+          photoType = result.type;
+        }
+      } catch (error) {
+        console.error("Failed to load contact photo:", error);
+      }
     }
 
-    const lines = [
+    const vCard = [
       "BEGIN:VCARD",
       "VERSION:3.0",
       `FN:${escapeVCardValue(contactName)}`,
-      `N:${escapeVCardValue(contactName)};;;`,
       `ORG:${escapeVCardValue(data.businessName)}`,
-    ];
+      `TITLE:${escapeVCardValue(data.contactTitle || "")}`,
 
-    if (data.contactTitle) {
-      lines.push(`TITLE:${escapeVCardValue(data.contactTitle)}`);
-    }
+      data.email ? `EMAIL;TYPE=WORK:${escapeVCardValue(data.email)}` : "",
 
-    if (data.phone) {
-      lines.push(`TEL;TYPE=CELL:${escapeVCardValue(data.phone)}`);
-    }
+      data.phone ? `TEL;TYPE=WORK:${escapeVCardValue(data.phone)}` : "",
 
-    if (data.email) {
-      lines.push(`EMAIL;TYPE=INTERNET:${escapeVCardValue(data.email)}`);
-    }
+      data.website ? `URL:${escapeVCardValue(data.website)}` : "",
 
-    if (data.website) {
-      lines.push(`URL:${escapeVCardValue(data.website)}`);
-    }
+      data.location
+        ? `ADR;TYPE=WORK:;;${escapeVCardValue(data.location)};;;;`
+        : "",
 
-    if (data.location) {
-      lines.push(`ADR;TYPE=WORK:;;${escapeVCardValue(data.location)};;;;`);
-    }
+      photoBase64 ? `PHOTO;ENCODING=b;TYPE=${photoType}:${photoBase64}` : "",
 
-    if (photo) {
-      lines.push(`PHOTO;ENCODING=b;TYPE=PNG:${photo}`);
-    }
+      "END:VCARD",
+    ]
+      .filter(Boolean)
+      .join("\r\n");
 
-    lines.push("END:VCARD");
-
-    const blob = new Blob([lines.join("\r\n")], {
+    const blob = new Blob([vCard], {
       type: "text/vcard;charset=utf-8",
     });
 
     const url = URL.createObjectURL(blob);
 
     const link = document.createElement("a");
-
     link.href = url;
-
-    link.download = `${data.businessName
-      .replace(/[^a-z0-9]/gi, "-")
-      .toLowerCase()}.vcf`;
+    link.download = `${contactName || data.businessName}.vcf`;
 
     document.body.appendChild(link);
-
     link.click();
-
-    link.remove();
+    document.body.removeChild(link);
 
     URL.revokeObjectURL(url);
   };
