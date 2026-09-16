@@ -1,5 +1,8 @@
 import type { BusinessProfile } from "@/lib/profiles";
+
 import BusinessModern from "./templates/BusinessModern";
+import BusinessBanner from "./templates/BusinessBanner";
+import BusinessCoffee from "./templates/BusinessCoffee";
 
 export default function BusinessProfile({
   profile,
@@ -9,6 +12,12 @@ export default function BusinessProfile({
   switch (profile.template) {
     case "modern":
       return <BusinessModern profile={profile} />;
+
+    case "businessbanner":
+      return <BusinessBanner profile={profile} />;
+
+    case "businesscoffee":
+      return <BusinessCoffee profile={profile} />;
 
     case "classic":
       return <BusinessModern profile={profile} />;

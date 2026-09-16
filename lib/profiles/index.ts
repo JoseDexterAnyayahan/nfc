@@ -1,11 +1,5 @@
 export type Social = {
-  platform:
-    | "facebook"
-    | "instagram"
-    | "tiktok"
-    | "linkedin"
-    | "youtube"
-    | "x";
+  platform: "facebook" | "instagram" | "tiktok" | "linkedin" | "youtube" | "x";
 
   url: string;
 };
@@ -46,16 +40,37 @@ export type BusinessProfile = {
 
   type: "business";
 
-  template: "modern" | "classic" | "minimal";
+  template:
+    | "modern"
+    | "businessbanner"
+    | "businesscoffee"
+    | "classic"
+    | "minimal";
 
   businessName: string;
   tagline?: string;
+
   logo: string;
+
+  banner?: string;
+
+  avatar?: string;
+  contactName?: string;
+  contactTitle?: string;
 
   email: string;
   phone: string;
+
+  whatsapp?: string;
+
   website?: string;
+
   link?: string;
+
+  location?: string;
+  locationUrl?: string;
+
+  reviewUrl?: string;
 
   socials?: Social[];
 };
@@ -67,17 +82,16 @@ import maria from "./personal/maria";
 
 import abcRealty from "./business/abc-realty";
 import xyzStudio from "./business/xyz-studio";
+import murdochAssociates from "./business/murdoch-associates";
+import suarezFarms from "./business/suarez-farms";
 
-const personalProfiles: PersonalProfile[] = [
-  john,
-  jd,
-  cel,
-  maria,
-];
+const personalProfiles: PersonalProfile[] = [john, jd, cel, maria];
 
 const businessProfiles: BusinessProfile[] = [
   abcRealty,
   xyzStudio,
+  murdochAssociates,
+  suarezFarms,
 ];
 
 export function getPersonalProfile(id: string) {
