@@ -3,6 +3,7 @@ import type { BusinessProfile } from "@/lib/profiles";
 import BusinessModern from "./templates/BusinessModern";
 import BusinessBanner from "./templates/BusinessBanner";
 import BusinessCoffee from "./templates/BusinessCoffee";
+import BusinessOwners from "./templates/BusinessOwners";
 
 export default function BusinessProfile({
   profile,
@@ -18,6 +19,9 @@ export default function BusinessProfile({
 
     case "businesscoffee":
       return <BusinessCoffee profile={profile} />;
+
+    case "businessowners":
+      return <BusinessOwners profile={profile} />;
 
     case "classic":
       return <BusinessModern profile={profile} />;

@@ -44,6 +44,7 @@ export type BusinessProfile = {
     | "modern"
     | "businessbanner"
     | "businesscoffee"
+    | "businessowners"
     | "classic"
     | "minimal";
 
@@ -73,6 +74,15 @@ export type BusinessProfile = {
   reviewUrl?: string;
 
   socials?: Social[];
+
+  bio?: string;
+
+  services?: {
+    name: string;
+    description?: string;
+  }[];
+
+  hours?: string;
 };
 
 import john from "./personal/john";
@@ -84,7 +94,7 @@ import abcRealty from "./business/abc-realty";
 import xyzStudio from "./business/xyz-studio";
 import murdochAssociates from "./business/murdoch-associates";
 import suarezFarms from "./business/suarez-farms";
-
+import dextap from "./business/dextap";
 const personalProfiles: PersonalProfile[] = [john, jd, cel, maria];
 
 const businessProfiles: BusinessProfile[] = [
@@ -92,6 +102,7 @@ const businessProfiles: BusinessProfile[] = [
   xyzStudio,
   murdochAssociates,
   suarezFarms,
+  dextap,
 ];
 
 export function getPersonalProfile(id: string) {
