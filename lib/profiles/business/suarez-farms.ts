@@ -25,7 +25,7 @@ const suarezFarms: BusinessProfile = {
   location: "Suarez Farms, Philippines",
 
   locationUrl:
-    "https://maps.google.com/?q=Suarez+Farms+Philippines",
+    "https://maps.app.goo.gl/mV9CLCNmcuGTwREH9s",
 
   /*
    * Google Review Link
