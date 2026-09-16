@@ -128,3 +128,11 @@
     @apply font-sans;
   }
 }
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+}

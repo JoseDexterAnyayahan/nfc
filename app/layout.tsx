@@ -14,25 +14,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DexTap",
-  description: "Created by DexTap — digital business cards made simple.",
-  applicationName: "DexTap",
+  title: "DexTap — Digital Solutions",
+  description:
+    "DexTap creates practical digital solutions for modern businesses.",
   generator: "DexTap",
-  authors: [
-    {
-      name: "DexTap",
-    },
-  ],
+  applicationName: "DexTap",
+  authors: [{ name: "DexTap" }],
   creator: "DexTap",
   publisher: "DexTap",
-
   icons: {
-    icon: [
-      {
-        url: "/dextap-logo.png",
-        type: "image/png",
-      },
-    ],
+    icon: "/dextap-logo.png",
     shortcut: "/dextap-logo.png",
     apple: "/dextap-logo.png",
   },
@@ -40,14 +31,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: LayoutProps<"/">) {
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-screen bg-white text-black dark:bg-black dark:text-white">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
