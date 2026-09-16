@@ -1,13 +1,13 @@
 import type { PersonalProfile } from "../index";
 
-const john: PersonalProfile = {
-  id: "P8xK42Lm",
+const jd: PersonalProfile = {
+  id: "P9xK42Lm",
   type: "personal",
-  template: "modern",
-  name: "John Cruz",
-  title: "Real Estate Professional",
-  avatar: "/profiles/personal/john.png",
-  email: "john@gmail.com",
+  template: "dossier",
+  name: "JD Anyayahan",
+  title: "CEO",
+  avatar: "/profiles/personal/jd.png",
+  email: "jdanyayahan@gmail.com",
   phone: "+63 917 123 4567",
   website: "https://example.com",
   socials: [
@@ -22,4 +22,4 @@ const john: PersonalProfile = {
   ],
 };
 
-export default john;
+export default jd;

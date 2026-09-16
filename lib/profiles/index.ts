@@ -6,37 +6,63 @@ export type Social = {
     | "linkedin"
     | "youtube"
     | "x";
+
   url: string;
 };
 
 export type PersonalProfile = {
   id: string;
+
   type: "personal";
-  template: "modern" | "classic" | "minimal";
+
+  template:
+    | "modern"
+    | "dossier"
+    | "personalpremium"
+    | "premium"
+    | "classic"
+    | "minimal";
+
   name: string;
   title?: string;
+  company?: string;
+
   avatar: string;
+
   email: string;
   phone: string;
+  whatsapp?: string;
+
   website?: string;
+
+  location?: string;
+  locationUrl?: string;
+
   socials?: Social[];
 };
 
 export type BusinessProfile = {
   id: string;
+
   type: "business";
+
   template: "modern" | "classic" | "minimal";
+
   businessName: string;
   tagline?: string;
   logo: string;
+
   email: string;
   phone: string;
   website?: string;
   link?: string;
+
   socials?: Social[];
 };
 
 import john from "./personal/john";
+import jd from "./personal/jd";
+import cel from "./personal/cel";
 import maria from "./personal/maria";
 
 import abcRealty from "./business/abc-realty";
@@ -44,6 +70,8 @@ import xyzStudio from "./business/xyz-studio";
 
 const personalProfiles: PersonalProfile[] = [
   john,
+  jd,
+  cel,
   maria,
 ];
 
