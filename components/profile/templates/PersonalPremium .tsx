@@ -40,15 +40,118 @@ type Props = {
   profile: PersonalProfile;
 };
 
-export default function PersonalPremium({ profile }: Props) {
+/*
+ * ============================================================
+ * VCARD HELPERS
+ * ============================================================
+ */
+
+/**
+ * Escape characters required by the vCard specification.
+ */
+function escapeVCardValue(value: string) {
+  return value
+    .replace(/\\/g, "\\\\")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,")
+    .replace(/\r?\n/g, "\\n");
+}
+
+/**
+ * Convert an image URL into Base64.
+ *
+ * This is done in the browser so the avatar can be embedded
+ * directly into the .vcf file.
+ */
+async function imageToBase64(
+  imageUrl: string
+): Promise<{
+  base64: string;
+  mimeType: string;
+} | null> {
+  try {
+    const response = await fetch(imageUrl);
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to load avatar: ${response.status}`
+      );
+    }
+
+    const blob = await response.blob();
+
+    const mimeType = blob.type || "image/jpeg";
+
+    const base64 = await new Promise<string>(
+      (resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+          const result = reader.result;
+
+          if (typeof result !== "string") {
+            reject(
+              new Error("Unable to convert avatar to Base64")
+            );
+            return;
+          }
+
+          /*
+           * FileReader returns:
+           *
+           * data:image/png;base64,XXXXXX
+           *
+           * We only need:
+           *
+           * XXXXXX
+           */
+          const commaIndex = result.indexOf(",");
+
+          if (commaIndex === -1) {
+            reject(
+              new Error("Invalid Base64 image data")
+            );
+            return;
+          }
+
+          resolve(result.substring(commaIndex + 1));
+        };
+
+        reader.onerror = () => {
+          reject(
+            new Error("Failed to read avatar image")
+          );
+        };
+
+        reader.readAsDataURL(blob);
+      }
+    );
+
+    return {
+      base64,
+      mimeType,
+    };
+  } catch (error) {
+    console.error(
+      "Unable to load profile avatar:",
+      error
+    );
+
+    return null;
+  }
+}
+
+export default function PersonalPremium({
+  profile,
+}: Props) {
   const { resolvedTheme, setTheme } = useTheme();
 
   const socials = profile.socials ?? [];
 
   /*
-   * ------------------------------------------------------------
+   * ============================================================
    * SHARE PROFILE
-   * ------------------------------------------------------------
+   * ============================================================
    */
   const handleShare = async () => {
     if (typeof window === "undefined") return;
@@ -63,7 +166,9 @@ export default function PersonalPremium({ profile }: Props) {
           url: window.location.href,
         });
       } else if (navigator.clipboard) {
-        await navigator.clipboard.writeText(window.location.href);
+        await navigator.clipboard.writeText(
+          window.location.href
+        );
       }
     } catch {
       // User cancelled the share dialog.
@@ -71,56 +176,218 @@ export default function PersonalPremium({ profile }: Props) {
   };
 
   /*
-   * ------------------------------------------------------------
+   * ============================================================
    * SAVE CONTACT
-   * ------------------------------------------------------------
+   * ============================================================
    */
-  const handleSaveContact = () => {
-    const vcard = [
-      "BEGIN:VCARD",
-      "VERSION:3.0",
-      `FN:${profile.name}`,
-      profile.title ? `TITLE:${profile.title}` : "",
-      profile.company ? `ORG:${profile.company}` : "",
-      profile.phone ? `TEL;TYPE=CELL:${profile.phone}` : "",
-      profile.whatsapp
-        ? `TEL;TYPE=WORK:${profile.whatsapp}`
-        : "",
-      profile.email ? `EMAIL:${profile.email}` : "",
-      profile.website ? `URL:${profile.website}` : "",
-      profile.location
-        ? `ADR:;;${profile.location}`
-        : "",
-      "END:VCARD",
-    ]
-      .filter(Boolean)
-      .join("\n");
+  const handleSaveContact = async () => {
+    try {
+      /*
+       * Get avatar first.
+       *
+       * The avatar is embedded into the vCard instead of
+       * simply referencing the website image URL.
+       */
+      const avatar = profile.avatar
+        ? await imageToBase64(profile.avatar)
+        : null;
 
-    const blob = new Blob([vcard], {
-      type: "text/vcard;charset=utf-8",
-    });
+      /*
+       * --------------------------------------------------------
+       * IMPORTANT:
+       *
+       * FN = Full Name
+       *
+       * N  = Structured Name
+       *
+       * ORG = Company
+       *
+       * Therefore the contact will be:
+       *
+       * Cel Carandang
+       *
+       * and NOT:
+       *
+       * Cel Carandang Consulting
+       * --------------------------------------------------------
+       */
 
-    const url = URL.createObjectURL(blob);
+      const firstName =
+        profile.name.trim().split(/\s+/)[0] || "";
 
-    const link = document.createElement("a");
+      const lastName =
+        profile.name
+          .trim()
+          .split(/\s+/)
+          .slice(1)
+          .join(" ") || "";
 
-    link.href = url;
-    link.download = `${profile.name
-      .trim()
-      .replace(/\s+/g, "-")
-      .toLowerCase()}.vcf`;
+      const lines = [
+        "BEGIN:VCARD",
+        "VERSION:3.0",
 
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+        /*
+         * Person's actual name.
+         */
+        `FN:${escapeVCardValue(profile.name)}`,
 
-    URL.revokeObjectURL(url);
+        /*
+         * Structured first/last name.
+         */
+        `N:${escapeVCardValue(
+          lastName
+        )};${escapeVCardValue(firstName)};;;`,
+
+        /*
+         * Job title.
+         */
+        profile.title
+          ? `TITLE:${escapeVCardValue(profile.title)}`
+          : "",
+
+        /*
+         * Company.
+         *
+         * This does NOT become the contact's name.
+         */
+        profile.company
+          ? `ORG:${escapeVCardValue(profile.company)}`
+          : "",
+
+        /*
+         * Phone.
+         */
+        profile.phone
+          ? `TEL;TYPE=CELL:${escapeVCardValue(
+              profile.phone
+            )}`
+          : "",
+
+        /*
+         * WhatsApp.
+         *
+         * Stored as another phone number because vCard
+         * applications generally recognize TEL reliably.
+         */
+        profile.whatsapp
+          ? `TEL;TYPE=WORK:${escapeVCardValue(
+              profile.whatsapp
+            )}`
+          : "",
+
+        /*
+         * Email.
+         */
+        profile.email
+          ? `EMAIL;TYPE=INTERNET:${escapeVCardValue(
+              profile.email
+            )}`
+          : "",
+
+        /*
+         * Website.
+         */
+        profile.website
+          ? `URL:${escapeVCardValue(profile.website)}`
+          : "",
+
+        /*
+         * Location.
+         */
+        profile.location
+          ? `ADR;TYPE=WORK:;;${escapeVCardValue(
+              profile.location
+            )};;;;`
+          : "",
+      ];
+
+      /*
+       * --------------------------------------------------------
+       * EMBED PROFILE IMAGE
+       * --------------------------------------------------------
+       *
+       * vCard supports:
+       *
+       * PHOTO;ENCODING=b;TYPE=JPEG:BASE64_DATA
+       *
+       * or
+       *
+       * PHOTO;ENCODING=b;TYPE=PNG:BASE64_DATA
+       */
+      if (avatar) {
+        const imageType = avatar.mimeType
+          .toLowerCase()
+          .includes("png")
+          ? "PNG"
+          : "JPEG";
+
+        lines.push(
+          `PHOTO;ENCODING=b;TYPE=${imageType}:${avatar.base64}`
+        );
+      }
+
+      lines.push("END:VCARD");
+
+      /*
+       * Remove empty lines.
+       */
+      const vcard = lines
+        .filter(Boolean)
+        .join("\r\n");
+
+      /*
+       * Create the .vcf file.
+       */
+      const blob = new Blob([vcard], {
+        type: "text/vcard;charset=utf-8",
+      });
+
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+
+      link.href = url;
+
+      /*
+       * The downloaded file is based on the PERSON'S NAME,
+       * not the company.
+       *
+       * Example:
+       *
+       * cel-carandang.vcf
+       */
+      link.download = `${profile.name
+        .trim()
+        .replace(/[^\w\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .toLowerCase()}.vcf`;
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      /*
+       * Clean up object URL.
+       */
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+      }, 1000);
+    } catch (error) {
+      console.error(
+        "Failed to create contact:",
+        error
+      );
+
+      alert(
+        "Unable to save the contact. Please try again."
+      );
+    }
   };
 
   /*
-   * ------------------------------------------------------------
+   * ============================================================
    * SOCIAL ICON
-   * ------------------------------------------------------------
+   * ============================================================
    */
   const getSocialIcon = (platform: string) => {
     switch (platform.toLowerCase()) {
@@ -148,9 +415,9 @@ export default function PersonalPremium({ profile }: Props) {
   };
 
   /*
-   * ------------------------------------------------------------
-   * COMMON STYLES
-   * ------------------------------------------------------------
+   * ============================================================
+   * STYLES
+   * ============================================================
    */
   const iconButtonClass = `
     flex
@@ -204,7 +471,7 @@ export default function PersonalPremium({ profile }: Props) {
       `}
     >
       {/* ======================================================
-          DECORATIVE BACKGROUND
+          DESKTOP BACKGROUND
           ====================================================== */}
       <div
         className="
@@ -281,7 +548,7 @@ export default function PersonalPremium({ profile }: Props) {
         "
       >
         {/* ====================================================
-            TOP RIGHT THEME TOGGLE
+            TOP RIGHT THEME BUTTON
             ==================================================== */}
         <button
           type="button"
@@ -329,7 +596,7 @@ export default function PersonalPremium({ profile }: Props) {
         </button>
 
         {/* ====================================================
-            GOLD TOP GLOW
+            GOLD GLOW
             ==================================================== */}
         <div
           className="
@@ -364,7 +631,6 @@ export default function PersonalPremium({ profile }: Props) {
           <div className="flex flex-col items-center text-center">
             {/* Avatar */}
             <div className="relative">
-              {/* Glow */}
               <div
                 className="
                   absolute
@@ -376,7 +642,6 @@ export default function PersonalPremium({ profile }: Props) {
                 aria-hidden="true"
               />
 
-              {/* Gold border */}
               <div
                 className="
                   relative
@@ -443,14 +708,11 @@ export default function PersonalPremium({ profile }: Props) {
             )}
 
             {/* ==================================================
-                SOCIALS + SHARE
-                EXACTLY:
-                - maximum 4 socials
-                - 1 share
+                4 SOCIALS + 1 SHARE
                 ================================================== */}
-            {(socials.length > 0 || true) && (
-              <div className="mt-6 flex items-center justify-center gap-3">
-                {socials.slice(0, 4).map((social, index) => (
+            <div className="mt-6 flex items-center justify-center gap-3">
+              {socials.slice(0, 4).map(
+                (social, index) => (
                   <a
                     key={`${social.platform}-${index}`}
                     href={social.url}
@@ -459,21 +721,23 @@ export default function PersonalPremium({ profile }: Props) {
                     aria-label={social.platform}
                     className={iconButtonClass}
                   >
-                    {getSocialIcon(social.platform)}
+                    {getSocialIcon(
+                      social.platform
+                    )}
                   </a>
-                ))}
+                )
+              )}
 
-                {/* Share */}
-                <button
-                  type="button"
-                  onClick={handleShare}
-                  aria-label="Share profile"
-                  className={iconButtonClass}
-                >
-                  <FiShare2 size={17} />
-                </button>
-              </div>
-            )}
+              {/* Share */}
+              <button
+                type="button"
+                onClick={handleShare}
+                aria-label="Share profile"
+                className={iconButtonClass}
+              >
+                <FiShare2 size={17} />
+              </button>
+            </div>
           </div>
 
           {/* ==================================================
@@ -646,7 +910,9 @@ export default function PersonalPremium({ profile }: Props) {
             {profile.website && (
               <a
                 href={
-                  profile.website.startsWith("http")
+                  profile.website.startsWith(
+                    "http"
+                  )
                     ? profile.website
                     : `https://${profile.website}`
                 }
@@ -707,7 +973,10 @@ export default function PersonalPremium({ profile }: Props) {
             {/* Location */}
             {profile.location && (
               <a
-                href={profile.locationUrl || undefined}
+                href={
+                  profile.locationUrl ||
+                  undefined
+                }
                 target={
                   profile.locationUrl
                     ? "_blank"
@@ -720,7 +989,8 @@ export default function PersonalPremium({ profile }: Props) {
                 }
                 onClick={
                   !profile.locationUrl
-                    ? (event) => event.preventDefault()
+                    ? (event) =>
+                        event.preventDefault()
                     : undefined
                 }
                 className={contactRowClass}
@@ -805,7 +1075,7 @@ export default function PersonalPremium({ profile }: Props) {
           </Button>
 
           {/* ==================================================
-              DEXTAP BRANDING
+              DEXTAP
               ================================================== */}
           <a
             href="https://dextap.vercel.app/"
