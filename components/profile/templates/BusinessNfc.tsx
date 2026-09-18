@@ -241,9 +241,9 @@ export default function BusinessNfc({
           {/* Banner */}
 
           <div className="relative h-[190px] sm:h-[220px]">
-            {profile.banner ? (
+            {profile.logo ? (
               <img
-                src={profile.banner}
+                src={profile.logo}
                 alt=""
                 className="h-full w-full object-cover"
               />
@@ -295,9 +295,9 @@ export default function BusinessNfc({
             ================================================== */}
 
             <div className="-mt-[52px] mb-5 flex h-[94px] w-[94px] items-center justify-center overflow-hidden rounded-[25px] border-[5px] border-[#1d2820] bg-white shadow-[0_10px_30px_rgba(0,0,0,0.2)] dark:border-[#151b17] sm:h-[102px] sm:w-[102px]">
-              {profile.logo ? (
+              {profile.banner ? (
                 <img
-                  src={profile.logo}
+                  src={profile.banner}
                   alt={profile.businessName}
                   className="h-full w-full object-contain"
                 />
