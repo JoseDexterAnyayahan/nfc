@@ -1,7 +1,7 @@
 import type { BusinessProfile } from "../index";
 
 const murdochAssociates: BusinessProfile = {
-  id: "M8rD42Xa",
+  id: "murdoch",
 
   type: "business",
 

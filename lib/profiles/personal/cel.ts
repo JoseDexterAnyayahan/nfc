@@ -13,7 +13,7 @@ const celCarandang: PersonalProfile = {
 
   email: "carandangmyng07@gmail.com",
   phone: "+63 945 813 1480",
-  website: "https://dextap.vercel.app/p/C7mR28Nx",
+  website: "https://dextap.vercel.app",
   location: "Oriental Mindoro, Philippines",
 
   socials: [

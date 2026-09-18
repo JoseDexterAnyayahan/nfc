@@ -1,5 +1,12 @@
 export type Social = {
-  platform: "facebook" | "instagram" | "tiktok" | "linkedin" | "youtube" | "x";
+  platform:
+    | "facebook"
+    | "instagram"
+    | "tiktok"
+    | "linkedin"
+    | "youtube"
+    | "whatsapp"
+    | "x";
 
   url: string;
 };
@@ -10,12 +17,8 @@ export type PersonalProfile = {
   type: "personal";
 
   template:
-    | "modern"
-    | "dossier"
-    | "personalpremium"
     | "premium"
-    | "classic"
-    | "minimal";
+    | "personalsocial";
 
   name: string;
   title?: string;
@@ -41,12 +44,10 @@ export type BusinessProfile = {
   type: "business";
 
   template:
-    | "modern"
     | "businessbanner"
     | "businesscoffee"
     | "businessowners"
-    | "classic"
-    | "minimal";
+    | "businessnfc";
 
   businessName: string;
   tagline?: string;
@@ -85,30 +86,34 @@ export type BusinessProfile = {
   hours?: string;
 };
 
-import john from "./personal/john";
-import jd from "./personal/jd";
 import cel from "./personal/cel";
-import maria from "./personal/maria";
+import dex from "./personal/dex";
 
-import abcRealty from "./business/abc-realty";
-import xyzStudio from "./business/xyz-studio";
 import murdochAssociates from "./business/murdoch-associates";
 import suarezFarms from "./business/suarez-farms";
 import dextap from "./business/dextap";
-const personalProfiles: PersonalProfile[] = [john, jd, cel, maria];
+import dextapV2 from "./business/dextap-v2";
+
+const personalProfiles: PersonalProfile[] = [
+  cel,
+  dex,
+];
 
 const businessProfiles: BusinessProfile[] = [
-  abcRealty,
-  xyzStudio,
   murdochAssociates,
   suarezFarms,
   dextap,
+  dextapV2,
 ];
 
 export function getPersonalProfile(id: string) {
-  return personalProfiles.find((profile) => profile.id === id);
+  return personalProfiles.find(
+    (profile) => profile.id === id,
+  );
 }
 
 export function getBusinessProfile(id: string) {
-  return businessProfiles.find((profile) => profile.id === id);
+  return businessProfiles.find(
+    (profile) => profile.id === id,
+  );
 }
