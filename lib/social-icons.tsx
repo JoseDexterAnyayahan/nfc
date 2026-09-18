@@ -5,6 +5,7 @@ import {
   FaLinkedinIn,
   FaYoutube,
   FaXTwitter,
+  FaWhatsapp,
 } from "react-icons/fa6";
 
 import type { Social } from "./profiles";
@@ -20,6 +21,7 @@ export function SocialIcon({
     tiktok: FaTiktok,
     linkedin: FaLinkedinIn,
     youtube: FaYoutube,
+    whatsapp: FaWhatsapp,
     x: FaXTwitter,
   };
 
