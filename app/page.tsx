@@ -7,6 +7,7 @@ import About from "@/components/dextap/about";
 import WhatWeDo from "@/components/dextap/what-we-do";
 import Contact from "@/components/dextap/contact";
 import Footer from "@/components/dextap/footer";
+import FloatingSocials from "@/components/dextap/floating-socials";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -32,6 +33,9 @@ export default function Home() {
       <Contact />
 
       <Footer />
+
+      {/* Floating Socials */}
+      <FloatingSocials />
     </main>
   );
 }
