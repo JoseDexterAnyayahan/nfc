@@ -4,6 +4,7 @@ import BusinessBanner from "./templates/BusinessBanner";
 import BusinessCoffee from "./templates/BusinessCoffee";
 import BusinessOwners from "./templates/BusinessOwners";
 import BusinessNfc from "./templates/BusinessNfc";
+import AuguriTemplate from "./templates/auguri/AuguriTemplate";
 
 export default function BusinessProfile({
   profile,
@@ -11,7 +12,6 @@ export default function BusinessProfile({
   profile: BusinessProfile;
 }) {
   switch (profile.template) {
-
     case "businessbanner":
       return <BusinessBanner profile={profile} />;
 
@@ -23,6 +23,9 @@ export default function BusinessProfile({
 
     case "businessnfc":
       return <BusinessNfc profile={profile} />;
+
+    case "auguri":
+      return <AuguriTemplate profile={profile} />;
 
     default:
       return <BusinessBanner profile={profile} />;
