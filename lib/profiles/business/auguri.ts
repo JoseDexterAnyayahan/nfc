@@ -25,7 +25,7 @@ const auguri: BusinessProfile = {
     "2nd Floor Calapan Town Center, J.P. Rizal St., Camilmil, Calapan City (beside Shakey’s), Calapan, Philippines, 5200",
 
   locationUrl:
-    "https://www.bing.com/maps/default.aspx?v=2&pc=FACEBK&mid=8100&where1=2nd%20Floor%20Calapan%20Town%20Center%2C%20J.P.%20Rizal%20St.%2C%20Camilmil%2C%20Calapan%20City%20%28beside%20Shakey%E2%80%99s%29%2C%20Calapan%2C%20Philippines%2C%205200&FORM=FBKPL1",
+    "https://www.google.com/maps/search/?api=1&query=Auguri%20Miltea%20House%2C%202nd%20Floor%20Calapan%20Town%20Center%2C%20J.P.%20Rizal%20St.%2C%20Camilmil%2C%20Calapan%20City%2C%20Oriental%20Mindoro%2C%20Philippines%2C%205200",
 
   reviewUrl:
     "https://search.google.com/local/writereview?placeid=ChIJAS_HPDrpvDMRb94pbg9olFY",

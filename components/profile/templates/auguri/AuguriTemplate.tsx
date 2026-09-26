@@ -41,7 +41,7 @@ const DEFAULT_LOCATION =
   "2nd Floor Calapan Town Center, J.P. Rizal St., Camilmil, Calapan City (beside Shakey’s), Calapan, Philippines, 5200";
 
 const DEFAULT_LOCATION_URL =
-  "https://www.bing.com/maps/default.aspx?v=2&pc=FACEBK&mid=8100&where1=2nd%20Floor%20Calapan%20Town%20Center%2C%20J.P.%20Rizal%20St.%2C%20Camilmil%2C%20Calapan%20City%20%28beside%20Shakey%E2%80%99s%29%2C%20Calapan%2C%20Philippines%2C%205200&FORM=FBKPL1";
+  "https://www.google.com/maps/search/?api=1&query=Auguri%20Miltea%20House%2C%202nd%20Floor%20Calapan%20Town%20Center%2C%20J.P.%20Rizal%20St.%2C%20Camilmil%2C%20Calapan%20City%2C%20Oriental%20Mindoro%2C%20Philippines%2C%205200";
 
 const DEFAULT_FACEBOOK = "https://www.facebook.com/augurimilkteahouse";
 
@@ -50,6 +50,51 @@ const DEFAULT_INSTAGRAM = "https://www.instagram.com/auguri.calapan/";
 const DEFAULT_PHONE = "0960 211 1905";
 
 const DEFAULT_EMAIL = "augurimilkteahouse@gmail.com";
+
+/*
+ * =============================================================
+ * COLORS
+ * -------------------------------------------------------------
+ * Every value below is a CSS variable, not a JS-computed hex
+ * string. The variables are declared once in the <style> block
+ * at the bottom of this file, with light values on :root and
+ * dark overrides under .dark (the class next-themes puts on
+ * <html>). Because the browser resolves var() against whatever
+ * class is already on <html> BEFORE React hydrates, the correct
+ * theme paints on the very first frame — nothing here waits on
+ * "mounted" or "resolvedTheme", so there's no light-mode flash
+ * before dark mode kicks in.
+ *
+ * "mounted" is still used below, but only for the Sun/Moon icon
+ * itself (an actual content difference, not a color), which is
+ * the standard, unavoidable next-themes pattern.
+ * =============================================================
+ */
+
+const colors = {
+  page: "var(--ag-page)",
+  section: "var(--ag-section)",
+  card: "var(--ag-card)",
+  text: "var(--ag-text)",
+  muted: "var(--ag-muted)",
+  gold: "var(--ag-gold)",
+  goldLight: "var(--ag-gold-light)",
+  border: "var(--ag-border)",
+  headerBg: "var(--ag-header-bg)",
+  mobileBarBg: "var(--ag-mobilebar-bg)",
+  bannerOverlay: "var(--ag-banner-overlay)",
+};
+
+/*
+ * Tinted gold backgrounds (icon chips, decorative blur circles,
+ * the review CTA rings) used to be built as `${hex}18`-style
+ * strings, which only worked because the hex was already known
+ * in JS. color-mix() does the same job directly in CSS, against
+ * whichever --ag-gold value is active — light or dark.
+ */
+function goldAlpha(percent: number) {
+  return `color-mix(in srgb, var(--ag-gold) ${percent}%, transparent)`;
+}
 
 export default function AuguriTemplate({ profile }: Props) {
   /*
@@ -66,7 +111,32 @@ export default function AuguriTemplate({ profile }: Props) {
     setMounted(true);
   }, []);
 
-  const isDark = mounted && resolvedTheme === "dark";
+  /*
+   * =========================================================
+   * SCROLL-AWARE BOTTOM BAR
+   * The floating action bar stays hidden until the visitor has
+   * actually scrolled away from the top of the page.
+   * =========================================================
+   */
+
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const SHOW_AFTER_PX = 120;
+
+    const handleScroll = () => {
+      setScrolled(window.scrollY > SHOW_AFTER_PX);
+    };
+
+    // Covers refreshes/back-navigation that land mid-scroll.
+    handleScroll();
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   /*
    * =========================================================
@@ -179,30 +249,6 @@ export default function AuguriTemplate({ profile }: Props) {
 
   /*
    * =========================================================
-   * COLORS
-   * =========================================================
-   */
-
-  const colors = {
-    page: isDark ? "#15100C" : "#F8F3EA",
-
-    section: isDark ? "#1C1510" : "#FFFDF8",
-
-    card: isDark ? "#211912" : "#FFFFFF",
-
-    text: isDark ? "#F5EEE3" : "#30241C",
-
-    muted: isDark ? "#B8ADA0" : "#776B60",
-
-    gold: isDark ? "#D0AD72" : "#B78A4A",
-
-    goldLight: isDark ? "#C49C61" : "#D3B37D",
-
-    border: isDark ? "#49382A" : "#E5D8C5",
-  };
-
-  /*
-   * =========================================================
    * FAVORITES
    * =========================================================
    */
@@ -284,9 +330,7 @@ export default function AuguriTemplate({ profile }: Props) {
           backdrop-blur-xl
         "
         style={{
-          backgroundColor: isDark
-            ? "rgba(21,16,12,0.88)"
-            : "rgba(248,243,234,0.88)",
+          backgroundColor: colors.headerBg,
           borderColor: colors.border,
         }}
       >
@@ -475,7 +519,7 @@ export default function AuguriTemplate({ profile }: Props) {
             blur-3xl
           "
           style={{
-            backgroundColor: `${colors.gold}18`,
+            backgroundColor: goldAlpha(18),
           }}
         />
 
@@ -491,7 +535,7 @@ export default function AuguriTemplate({ profile }: Props) {
             blur-3xl
           "
           style={{
-            backgroundColor: `${colors.gold}10`,
+            backgroundColor: goldAlpha(10),
           }}
         />
 
@@ -547,9 +591,7 @@ export default function AuguriTemplate({ profile }: Props) {
               <div
                 className="absolute inset-0"
                 style={{
-                  background: isDark
-                    ? "linear-gradient(to bottom, rgba(21,16,12,0.10), rgba(21,16,12,0.78))"
-                    : "linear-gradient(to bottom, rgba(48,36,28,0.05), rgba(48,36,28,0.62))",
+                  background: colors.bannerOverlay,
                 }}
               />
 
@@ -1334,7 +1376,7 @@ export default function AuguriTemplate({ profile }: Props) {
                   rounded-full
                 "
                 style={{
-                  backgroundColor: `${colors.gold}16`,
+                  backgroundColor: goldAlpha(16),
                   color: colors.gold,
                 }}
               >
@@ -1416,7 +1458,7 @@ export default function AuguriTemplate({ profile }: Props) {
                   rounded-full
                 "
                 style={{
-                  backgroundColor: `${colors.gold}16`,
+                  backgroundColor: goldAlpha(16),
                   color: colors.gold,
                 }}
               >
@@ -1553,7 +1595,7 @@ export default function AuguriTemplate({ profile }: Props) {
                   rounded-full
                 "
                 style={{
-                  backgroundColor: `${colors.gold}16`,
+                  backgroundColor: goldAlpha(16),
                   color: colors.gold,
                 }}
               >
@@ -1636,7 +1678,7 @@ export default function AuguriTemplate({ profile }: Props) {
                   rounded-full
                 "
                 style={{
-                  backgroundColor: `${colors.gold}16`,
+                  backgroundColor: goldAlpha(16),
                   color: colors.gold,
                 }}
               >
@@ -1721,7 +1763,7 @@ export default function AuguriTemplate({ profile }: Props) {
                   rounded-full
                 "
                 style={{
-                  backgroundColor: `${colors.gold}16`,
+                  backgroundColor: goldAlpha(16),
                   color: colors.gold,
                 }}
               >
@@ -1806,7 +1848,7 @@ export default function AuguriTemplate({ profile }: Props) {
                   rounded-full
                 "
                 style={{
-                  backgroundColor: `${colors.gold}16`,
+                  backgroundColor: goldAlpha(16),
                   color: colors.gold,
                 }}
               >
@@ -1901,7 +1943,7 @@ export default function AuguriTemplate({ profile }: Props) {
               border
             "
             style={{
-              borderColor: `${colors.gold}30`,
+              borderColor: goldAlpha(30),
             }}
           />
 
@@ -1917,7 +1959,7 @@ export default function AuguriTemplate({ profile }: Props) {
               border
             "
             style={{
-              borderColor: `${colors.gold}20`,
+              borderColor: goldAlpha(20),
             }}
           />
 
@@ -2150,7 +2192,7 @@ export default function AuguriTemplate({ profile }: Props) {
                     rounded-full
                   "
                   style={{
-                    backgroundColor: `${colors.gold}16`,
+                    backgroundColor: goldAlpha(16),
                     color: colors.gold,
                   }}
                 >
@@ -2370,10 +2412,12 @@ export default function AuguriTemplate({ profile }: Props) {
 
       {/* =====================================================
           MOBILE BOTTOM ACTION BAR
+          Hidden at the top of the page; fades and slides in
+          once the visitor has actually scrolled.
           ===================================================== */}
 
       <div
-        className="
+        className={`
           fixed
           bottom-4
           left-1/2
@@ -2381,8 +2425,17 @@ export default function AuguriTemplate({ profile }: Props) {
           w-[calc(100%-2rem)]
           max-w-md
           -translate-x-1/2
+          transition-all
+          duration-300
+          ease-out
           sm:hidden
-        "
+          ${
+            scrolled
+              ? "translate-y-0 opacity-100"
+              : "pointer-events-none translate-y-24 opacity-0"
+          }
+        `}
+        aria-hidden={!scrolled}
       >
         <div
           className="
@@ -2397,9 +2450,7 @@ export default function AuguriTemplate({ profile }: Props) {
           "
           style={{
             borderColor: colors.border,
-            backgroundColor: isDark
-              ? "rgba(33,25,18,0.94)"
-              : "rgba(255,253,248,0.94)",
+            backgroundColor: colors.mobileBarBg,
           }}
         >
           <a
@@ -2472,6 +2523,51 @@ export default function AuguriTemplate({ profile }: Props) {
           </button>
         </div>
       </div>
+
+      {/*
+        Theme variables. Light values on :root, dark overrides
+        under .dark — the class next-themes applies to <html>
+        before hydration. This is what removes the color flash:
+        the browser paints from these on the very first frame,
+        with no JS round-trip required.
+      */}
+      <style>{`
+        :root {
+          --ag-page: #F8F3EA;
+          --ag-section: #FFFDF8;
+          --ag-card: #FFFFFF;
+          --ag-text: #30241C;
+          --ag-muted: #776B60;
+          --ag-gold: #B78A4A;
+          --ag-gold-light: #D3B37D;
+          --ag-border: #E5D8C5;
+          --ag-header-bg: rgba(248, 243, 234, 0.88);
+          --ag-mobilebar-bg: rgba(255, 253, 248, 0.94);
+          --ag-banner-overlay: linear-gradient(
+            to bottom,
+            rgba(48, 36, 28, 0.05),
+            rgba(48, 36, 28, 0.62)
+          );
+        }
+
+        .dark {
+          --ag-page: #15100C;
+          --ag-section: #1C1510;
+          --ag-card: #211912;
+          --ag-text: #F5EEE3;
+          --ag-muted: #B8ADA0;
+          --ag-gold: #D0AD72;
+          --ag-gold-light: #C49C61;
+          --ag-border: #49382A;
+          --ag-header-bg: rgba(21, 16, 12, 0.88);
+          --ag-mobilebar-bg: rgba(33, 25, 18, 0.94);
+          --ag-banner-overlay: linear-gradient(
+            to bottom,
+            rgba(21, 16, 12, 0.1),
+            rgba(21, 16, 12, 0.78)
+          );
+        }
+      `}</style>
     </main>
   );
 }
