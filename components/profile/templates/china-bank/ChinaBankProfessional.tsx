@@ -408,28 +408,34 @@ export default function ChinaBankProfessional({ profile }: Props) {
   };
 
   const handleSaveContact = async () => {
-    if (saving) return;
-
-    setSaving(true);
-
     try {
       const nameParts = contactName.split(/\s+/);
       const firstName = nameParts[0] || "";
       const lastName = nameParts.slice(1).join(" ") || "";
+
+      const profileUrl = "https://dextap.vercel.app/b/gio-manalo";
 
       const avatarData = avatar ? await imageToBase64(avatar) : null;
 
       const lines = [
         "BEGIN:VCARD",
         "VERSION:3.0",
+
         `FN:${escapeVCardValue(contactName)}`,
+
         `N:${escapeVCardValue(lastName)};${escapeVCardValue(firstName)};;;`,
+
         `ORG:${escapeVCardValue(businessName)}`,
+
         `TITLE:${escapeVCardValue(contactTitle)}`,
+
         `TEL;TYPE=CELL:${escapeVCardValue(phone)}`,
+
         `EMAIL;TYPE=INTERNET:${escapeVCardValue(email)}`,
-        `URL:${AUGURI_URL}`,
-        `NOTE:Other business - Auguri`,
+
+        `URL:${profileUrl}`,
+
+        "NOTE:Other Business - Auguri",
       ];
 
       if (location) {
@@ -451,28 +457,29 @@ export default function ChinaBankProfessional({ profile }: Props) {
       });
 
       const url = URL.createObjectURL(blob);
+
       const link = document.createElement("a");
 
       link.href = url;
+
       link.download = `${contactName
         .replace(/[^\w\s-]/g, "")
         .replace(/\s+/g, "-")
         .toLowerCase()}.vcf`;
 
       document.body.appendChild(link);
+
       link.click();
+
       document.body.removeChild(link);
 
       window.setTimeout(() => {
         URL.revokeObjectURL(url);
       }, 1000);
-
-      showToast("Contact card ready");
     } catch (error) {
       console.error("Failed to create contact:", error);
-      showToast("Couldn't create the contact. Please try again.");
-    } finally {
-      setSaving(false);
+
+      alert("Unable to save the contact. Please try again.");
     }
   };
 
