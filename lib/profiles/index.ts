@@ -95,7 +95,8 @@ export type BusinessProfile = {
     | "businesscoffee"
     | "businessowners"
     | "businessnfc"
-    | "auguri";
+    | "auguri"
+      | "professional";
 
   businessName: string;
   tagline?: string;
@@ -141,6 +142,7 @@ import suarezFarms from "./business/suarez-farms";
 import dextap from "./business/dextap";
 import dextapV2 from "./business/dextap-v2";
 import auguri from "./business/auguri";
+import gioManalo from "./business/gio-manalo";
 
 const personalProfiles: PersonalProfile[] = [
   cel,
@@ -156,6 +158,7 @@ const businessProfiles: BusinessProfile[] = [
   dextap,
   dextapV2,
   auguri,
+  gioManalo,
 ];
 
 export function getPersonalProfile(id: string) {
