@@ -29,7 +29,7 @@ const gioManalo: BusinessProfile = {
   socials: [
     {
       platform: "facebook",
-      url: "https://www.facebook.com/search/top?q=Leige%20Manalo",
+      url: "https://www.facebook.com/leige.direct",
     },
   ],
 };
