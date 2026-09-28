@@ -9,7 +9,7 @@ const gioManalo: BusinessProfile = {
   tagline: "Business Manager",
 
   // China Bank Savings branding
-  logo: "/profiles/business/china-bank-savings/cbs-cover.png",
+  logo: "/profiles/business/china-bank-savings/gio.jpg",
   banner: "/profiles/business/china-bank-savings/cbs-cover.jpg",
 
   // Gio's personal profile photo
