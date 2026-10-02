@@ -4,7 +4,6 @@ import Image from "next/image";
 import { Poppins } from "next/font/google";
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { useTheme } from "next-themes";
 import type { BusinessProfile } from "@/lib/profiles";
 
 import {
@@ -15,13 +14,11 @@ import {
   Loader2,
   Mail,
   MapPin,
-  Moon,
   Navigation,
   Phone,
   PiggyBank,
   Share2,
   ShieldCheck,
-  Sun,
   UserPlus,
   Wallet,
 } from "lucide-react";
@@ -79,11 +76,11 @@ const SERVICES = [
  * =============================================================
  * COLORS
  * -------------------------------------------------------------
- * Every value is a CSS variable, declared in the <style> block at
- * the top of the component (light on :root, dark under .dark — the
- * class next-themes puts on the document root before hydration).
- * The browser paints the right theme on the first frame, so there
- * is no light-mode flash on refresh.
+ * This profile is dark-mode only, by request — there is no light
+ * palette and no toggle. Colors are still CSS variables (declared
+ * once in the <style> block below) rather than hex strings, which
+ * just keeps the rest of the component tidy; they no longer vary
+ * by theme at all.
  * =============================================================
  */
 
@@ -267,20 +264,12 @@ function ContactRow({
  */
 
 export default function ChinaBankProfessional({ profile }: Props) {
-  const { resolvedTheme, setTheme } = useTheme();
-
-  // Only needed for the Sun/Moon icon itself (real content, not color).
-  const [mounted, setMounted] = useState(false);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [showBar, setShowBar] = useState(false);
 
   const heroActionsRef = useRef<HTMLDivElement>(null);
   const toastTimer = useRef<number | null>(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   /*
    * The floating action bar stays hidden until the hero actions
@@ -408,6 +397,10 @@ export default function ChinaBankProfessional({ profile }: Props) {
   };
 
   const handleSaveContact = async () => {
+    if (saving) return;
+
+    setSaving(true);
+
     try {
       const nameParts = contactName.split(/\s+/);
       const firstName = nameParts[0] || "";
@@ -476,10 +469,14 @@ export default function ChinaBankProfessional({ profile }: Props) {
       window.setTimeout(() => {
         URL.revokeObjectURL(url);
       }, 1000);
+
+      showToast("Contact card ready");
     } catch (error) {
       console.error("Failed to create contact:", error);
 
-      alert("Unable to save the contact. Please try again.");
+      showToast("Couldn't create the contact. Please try again.");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -520,40 +517,27 @@ export default function ChinaBankProfessional({ profile }: Props) {
 
   return (
     <main
-      className={`${poppins.className} min-h-dvh w-full overflow-x-hidden transition-colors duration-500`}
+      className={`${poppins.className} min-h-dvh w-full overflow-x-hidden`}
       style={{
         backgroundColor: colors.page,
         color: colors.text,
       }}
     >
       {/*
-        Theme variables + motion. Kept at the very top so the
-        variables exist before any element that uses them.
+        Theme variables + motion. Dark-only by request: one fixed
+        palette, no :root/.dark split and no toggle anywhere below.
       */}
       <style>{`
         :root {
-          --cb-page: #f4f4f2;
-          --cb-card: #ffffff;
-          --cb-card-soft: #fafafa;
-          --cb-text: #171717;
-          --cb-muted: #6d6d68;
-          --cb-border: #e5e5e1;
-          --cb-red: #e01e1c;
-          --cb-red-text: #cf1b19;
-          --cb-yellow: #f8d346;
-          --cb-yellow-soft: #fff7d2;
-          --cb-header-bg: rgba(244, 244, 242, 0.9);
-          --cb-bar-bg: rgba(255, 255, 255, 0.94);
-        }
-
-        .dark {
           --cb-page: #101010;
           --cb-card: #181818;
           --cb-card-soft: #202020;
           --cb-text: #f7f7f4;
           --cb-muted: #aaa9a3;
           --cb-border: #343434;
+          --cb-red: #e01e1c;
           --cb-red-text: #ff5a57;
+          --cb-yellow: #f8d346;
           --cb-yellow-soft: #3a321b;
           --cb-header-bg: rgba(16, 16, 16, 0.9);
           --cb-bar-bg: rgba(24, 24, 24, 0.94);
@@ -564,7 +548,7 @@ export default function ChinaBankProfessional({ profile }: Props) {
           outline-offset: 2px;
         }
 
-        .dark .cb-map {
+        .cb-map {
           filter: brightness(0.86) contrast(1.05);
         }
 
@@ -660,36 +644,6 @@ export default function ChinaBankProfessional({ profile }: Props) {
               }}
             >
               <Share2 size={16} />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                if (!mounted) return;
-
-                setTheme(resolvedTheme === "dark" ? "light" : "dark");
-              }}
-              aria-label={
-                !mounted
-                  ? "Toggle theme"
-                  : resolvedTheme === "dark"
-                    ? "Switch to light mode"
-                    : "Switch to dark mode"
-              }
-              className={actionClass}
-              style={{
-                borderColor: colors.border,
-                backgroundColor: colors.card,
-                color: colors.redText,
-              }}
-            >
-              {!mounted ? (
-                <span className="h-4 w-4" />
-              ) : resolvedTheme === "dark" ? (
-                <Sun size={16} />
-              ) : (
-                <Moon size={16} />
-              )}
             </button>
           </div>
         </div>
