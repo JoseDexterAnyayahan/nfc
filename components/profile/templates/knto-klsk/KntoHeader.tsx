@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -7,6 +8,9 @@ import {
   FaExternalLinkAlt,
   FaMapMarkerAlt,
   FaPhone,
+  FaShareAlt,
+  FaCheck,
+  FaCopy,
 } from "react-icons/fa";
 
 import type { BusinessProfile } from "@/lib/profiles";
@@ -19,12 +23,13 @@ type Props = {
 
 const contactEmail = "kntoklsk@gmail.com";
 const contactPhone = "0966 401 4224";
-
 const contactAddress =
   "2nd Floor, Osmeña cor. Bonifacio St., Ilaya, Calapan City 5200, Calapan, Philippines, 5200";
 
 const contactMapsUrl =
   "https://maps.app.goo.gl/Cbi8GqnQLy9FngaRA";
+
+const profileUrl = "https://dextap.vercel.app/b/knto-klsk";
 
 export default function KntoHeader({
   profile,
@@ -32,6 +37,7 @@ export default function KntoHeader({
 }: Props) {
   const [bannerFailed, setBannerFailed] = useState(false);
   const [logoFailed, setLogoFailed] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const mapsUrl = profile.locationUrl || contactMapsUrl;
 
@@ -42,6 +48,51 @@ export default function KntoHeader({
     borderColor: c.line,
     color: c.ink,
     backgroundColor: c.paper,
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: profile.businessName || "KNTO KLSK",
+      text: "DROP THE NEEDLE. SIP THE MOMENTS. Visit KNTO KLSK on DexTap.",
+      url: profileUrl,
+    };
+
+    try {
+      if (typeof navigator.share === "function") {
+        await navigator.share(shareData);
+        return;
+      }
+
+      await navigator.clipboard.writeText(profileUrl);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      // Sharing can be cancelled by the user.
+      if (error instanceof Error && error.name === "AbortError") {
+        return;
+      }
+
+      // Fallback for browsers where native sharing or clipboard access fails.
+      try {
+        const textArea = document.createElement("textarea");
+        textArea.value = profileUrl;
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+
+        document.body.appendChild(textArea);
+        textArea.select();
+
+        const successful = document.execCommand("copy");
+        textArea.remove();
+
+        if (successful) {
+          setCopied(true);
+          window.setTimeout(() => setCopied(false), 2000);
+        }
+      } catch {
+        console.error("Unable to share or copy the KNTO KLSK link.");
+      }
+    }
   };
 
   return (
@@ -186,11 +237,9 @@ export default function KntoHeader({
               >
                 Your neighborhood listening house
               </p>
-
               <h1 className="mt-2 break-words text-3xl font-semibold leading-[1.12] tracking-[-0.055em] sm:text-4xl lg:text-5xl">
                 {profile.businessName}
               </h1>
-
               <p
                 className="mt-3 max-w-xl text-[10px] font-medium leading-6 tracking-[0.09em] sm:text-xs sm:tracking-[0.12em] lg:text-sm"
                 style={{ color: c.muted }}
@@ -202,7 +251,7 @@ export default function KntoHeader({
 
           {/* QUICK ACTIONS */}
           <div className="mt-7 grid grid-cols-10 gap-2 sm:mt-8 sm:flex sm:flex-wrap sm:gap-3">
-            {/* Save Contact — 70% mobile width */}
+            {/* Save Contact */}
             <button
               type="button"
               onClick={onSaveContact}
@@ -220,7 +269,7 @@ export default function KntoHeader({
               <span className="truncate">Save Contact</span>
             </button>
 
-            {/* Directions — 30% mobile width */}
+            {/* Directions */}
             <a
               href={mapsUrl}
               target="_blank"
@@ -236,7 +285,6 @@ export default function KntoHeader({
                 size={9}
               />
             </a>
-
           </div>
 
           {/* DIVIDER */}
@@ -249,12 +297,45 @@ export default function KntoHeader({
 
           {/* CONTACT DETAILS */}
           <div className="mt-5 sm:mt-6">
-            <p
-              className="mb-3 text-[9px] font-semibold uppercase tracking-[0.2em]"
-              style={{ color: c.wood }}
-            >
-              Visit & get in touch
-            </p>
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <p
+                className="text-[9px] font-semibold uppercase tracking-[0.2em]"
+                style={{ color: c.wood }}
+              >
+                Visit &amp; get in touch
+              </p>
+
+              {/* Share profile link — far right */}
+              <button
+                type="button"
+                onClick={handleShare}
+                aria-label="Share KNTO KLSK profile"
+                title={copied ? "Link copied!" : "Share profile"}
+                className="inline-flex h-9 w-9 shrink-0 items-center justify-center border transition-all duration-200 hover:opacity-70 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                style={{
+                  borderColor: c.line,
+                  backgroundColor: c.paper,
+                  color: c.wood,
+                }}
+              >
+                {copied ? (
+                  <FaCheck size={14} />
+                ) : (
+                  <FaShareAlt size={14} />
+                )}
+              </button>
+            </div>
+
+            {copied && (
+              <p
+                className="mb-3 text-right text-[10px] font-medium"
+                role="status"
+                style={{ color: c.wood }}
+              >
+                <FaCopy className="mr-1 inline" size={10} />
+                Profile link copied
+              </p>
+            )}
 
             <div className="grid grid-cols-1 gap-0 sm:grid-cols-2 sm:gap-x-8 lg:grid-cols-3">
               {/* Email detail */}
@@ -272,7 +353,6 @@ export default function KntoHeader({
                 >
                   <FaEnvelope size={13} />
                 </span>
-
                 <span className="min-w-0 flex-1">
                   <span
                     className="block text-[8px] font-semibold uppercase tracking-[0.16em]"
@@ -301,7 +381,6 @@ export default function KntoHeader({
                 >
                   <FaPhone size={13} />
                 </span>
-
                 <span className="min-w-0 flex-1">
                   <span
                     className="block text-[8px] font-semibold uppercase tracking-[0.16em]"
@@ -317,7 +396,7 @@ export default function KntoHeader({
 
               {/* Address detail */}
               <a
-                href={contactMapsUrl}
+                href={mapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group flex min-w-0 items-start gap-3 border-b py-3 transition-colors sm:col-span-2 sm:border-b-0 sm:py-3 lg:col-span-1"
@@ -332,7 +411,6 @@ export default function KntoHeader({
                 >
                   <FaMapMarkerAlt size={14} />
                 </span>
-
                 <span className="min-w-0 flex-1">
                   <span
                     className="block text-[8px] font-semibold uppercase tracking-[0.16em]"
@@ -366,7 +444,6 @@ export default function KntoHeader({
             >
               Est. for good moments
             </span>
-
             <span
               className="text-[8px] font-medium uppercase tracking-[0.16em] sm:text-[9px] sm:tracking-[0.2em]"
               style={{ color: c.muted }}
