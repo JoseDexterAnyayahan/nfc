@@ -11,15 +11,15 @@ const kntoKlsk: BusinessProfile = {
   logo: "/profiles/business/knto-klsk/knto-logo.jpg",
   banner: "/profiles/business/knto-klsk/knto-banner.jpg",
 
-  email: "",
-  phone: "",
+  email: "kntoklsk@gmail.com",
+  phone: "0966 401 4224",
   website: "",
 
   location:
     "C57J+G7X, Osmeña, A. Bonifacio, Calapan City, Oriental Mindoro",
 
   locationUrl:
-    "https://www.google.com/maps/search/?api=1&query=C57J%2BG7X%2C%20Osme%C3%B1a%2C%20A.%20Bonifacio%2C%20Calapan%20City%2C%20Oriental%20Mindoro",
+    "https://maps.app.goo.gl/Cbi8GqnQLy9FngaRA",
 
   socials: [
     {

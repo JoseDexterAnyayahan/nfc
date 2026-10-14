@@ -1,6 +1,8 @@
 "use client";
 
-import { FaCompactDisc, FaArrowUp } from "react-icons/fa";
+import Image from "next/image";
+import { FaArrowUp } from "react-icons/fa";
+
 import { kntoColors as c } from "./knto-styles";
 
 export default function KntoFooter() {
@@ -25,20 +27,20 @@ export default function KntoFooter() {
           {/* Brand */}
           <div className="flex min-w-0 flex-col items-center sm:items-start">
             <div className="flex items-center justify-center gap-2.5 sm:justify-start">
-              <span
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border"
+              <div
+                className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full"
                 style={{
-                  borderColor: c.line,
                   backgroundColor: c.paper,
-                  color: c.wood,
                 }}
-                aria-hidden="true"
               >
-                <FaCompactDisc
-                  size={17}
-                  className="transition-transform duration-700 group-hover:rotate-180"
+                <Image
+                  src="/profiles/business/knto-klsk/knto-logo.jpg"
+                  alt="KNTO KLSK logo"
+                  fill
+                  sizes="40px"
+                  className="object-contain"
                 />
-              </span>
+              </div>
 
               <div className="text-left">
                 <p className="text-xs font-semibold tracking-[0.18em] sm:text-sm">
@@ -75,7 +77,6 @@ export default function KntoFooter() {
             }}
           >
             Back to top
-
             <FaArrowUp
               size={10}
               className="transition-transform duration-300 group-hover:-translate-y-1"
@@ -93,17 +94,11 @@ export default function KntoFooter() {
 
         {/* Footer bottom */}
         <div className="flex flex-col items-center gap-2 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left">
-          <p
-            className="text-[9px] leading-5"
-            style={{ color: c.muted }}
-          >
+          <p className="text-[9px] leading-5" style={{ color: c.muted }}>
             Made for good coffee and better company.
           </p>
 
-          <p
-            className="text-[9px] leading-5"
-            style={{ color: c.muted }}
-          >
+          <p className="text-[9px] leading-5" style={{ color: c.muted }}>
             Powered by{" "}
             <a
               href="https://dextap.vercel.app/"

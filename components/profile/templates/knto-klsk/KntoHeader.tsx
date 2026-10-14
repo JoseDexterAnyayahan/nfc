@@ -17,6 +17,15 @@ type Props = {
   onSaveContact: () => void;
 };
 
+const contactEmail = "kntoklsk@gmail.com";
+const contactPhone = "0966 401 4224";
+
+const contactAddress =
+  "2nd Floor, Osmeña cor. Bonifacio St., Ilaya, Calapan City 5200, Calapan, Philippines, 5200";
+
+const contactMapsUrl =
+  "https://maps.app.goo.gl/Cbi8GqnQLy9FngaRA";
+
 export default function KntoHeader({
   profile,
   onSaveContact,
@@ -24,13 +33,7 @@ export default function KntoHeader({
   const [bannerFailed, setBannerFailed] = useState(false);
   const [logoFailed, setLogoFailed] = useState(false);
 
-  const mapsUrl =
-    profile.locationUrl ||
-    (profile.location
-      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-          profile.location
-        )}`
-      : undefined);
+  const mapsUrl = profile.locationUrl || contactMapsUrl;
 
   const actionBase =
     "group inline-flex min-h-12 min-w-0 items-center justify-center gap-2 border px-2.5 py-3 text-[10px] font-semibold uppercase transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.98] sm:min-h-[50px] sm:gap-2.5 sm:px-5 sm:tracking-[0.1em]";
@@ -46,14 +49,11 @@ export default function KntoHeader({
       className="relative w-full overflow-hidden"
       style={{ backgroundColor: c.paper, color: c.ink }}
     >
-      {/* =========================================
-          HERO BANNER
-      ========================================== */}
+      {/* HERO BANNER */}
       <div
-        className="relative h-52 overflow-hidden xs:h-60 sm:h-80 lg:h-[390px]"
+        className="relative h-52 overflow-hidden sm:h-80 lg:h-[390px]"
         style={{ backgroundColor: c.espresso }}
       >
-        {/* Actual banner image */}
         {!bannerFailed && profile.banner ? (
           <img
             src={profile.banner}
@@ -62,7 +62,6 @@ export default function KntoHeader({
             onError={() => setBannerFailed(true)}
           />
         ) : (
-          /* Fallback banner when no image is available */
           <div
             className="absolute inset-0 flex items-center justify-center"
             style={{
@@ -78,11 +77,9 @@ export default function KntoHeader({
               <p className="text-5xl sm:text-7xl lg:text-8xl">
                 KNTO
               </p>
-
               <p className="my-3 text-[9px] tracking-[0.55em] sm:text-xs">
                 THE LISTENING HOUSE
               </p>
-
               <p className="text-5xl sm:text-7xl lg:text-8xl">
                 KLSK
               </p>
@@ -90,7 +87,7 @@ export default function KntoHeader({
           </div>
         )}
 
-        {/* Vintage cinematic overlay */}
+        {/* Vintage overlay */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
@@ -99,7 +96,7 @@ export default function KntoHeader({
           }}
         />
 
-        {/* Subtle inner frame */}
+        {/* Inner frame */}
         <div
           className="pointer-events-none absolute inset-3 border sm:inset-5"
           style={{ borderColor: "rgba(244,235,221,0.20)" }}
@@ -119,7 +116,7 @@ export default function KntoHeader({
           </span>
         </div>
 
-        {/* Tagline in the banner */}
+        {/* Banner tagline */}
         <div className="absolute bottom-7 right-7 z-10 max-w-[75%] text-right sm:bottom-10 sm:right-10">
           <p
             className="text-[9px] font-medium uppercase tracking-[0.16em] sm:text-xs sm:tracking-[0.24em]"
@@ -127,7 +124,6 @@ export default function KntoHeader({
           >
             Drop the needle.
           </p>
-
           <p
             className="mt-1.5 text-[9px] font-medium uppercase tracking-[0.16em] sm:text-xs sm:tracking-[0.24em]"
             style={{ color: "rgba(244,235,221,0.92)" }}
@@ -137,9 +133,7 @@ export default function KntoHeader({
         </div>
       </div>
 
-      {/* =========================================
-          BUSINESS IDENTITY
-      ========================================== */}
+      {/* BUSINESS IDENTITY */}
       <div
         className="relative"
         style={{ backgroundColor: c.paper, color: c.ink }}
@@ -174,7 +168,6 @@ export default function KntoHeader({
                   >
                     K·K
                   </span>
-
                   <span
                     className="mt-1 text-[7px] font-semibold uppercase tracking-[0.16em] sm:text-[9px] sm:tracking-[0.2em]"
                     style={{ color: c.wood }}
@@ -185,7 +178,7 @@ export default function KntoHeader({
               )}
             </div>
 
-            {/* Business name and tagline */}
+            {/* Name and tagline */}
             <div className="mt-5 min-w-0 flex-1 sm:mt-0 sm:pb-1">
               <p
                 className="text-[9px] font-semibold uppercase leading-relaxed tracking-[0.16em] sm:text-[10px] sm:tracking-[0.22em]"
@@ -207,21 +200,13 @@ export default function KntoHeader({
             </div>
           </div>
 
-          {/* =========================================
-              RESPONSIVE QUICK ACTIONS
-
-              Mobile:
-              Save Contact = 70%
-              Directions   = 30%
-
-              Call and Email share the next row.
-          ========================================== */}
+          {/* QUICK ACTIONS */}
           <div className="mt-7 grid grid-cols-10 gap-2 sm:mt-8 sm:flex sm:flex-wrap sm:gap-3">
-            {/* Save Contact: 70% on mobile */}
+            {/* Save Contact — 70% mobile width */}
             <button
               type="button"
               onClick={onSaveContact}
-              className={`${actionBase} col-span-7 sm:col-span-auto sm:min-w-[165px]`}
+              className={`${actionBase} col-span-7 sm:min-w-[165px]`}
               style={{
                 borderColor: c.espresso,
                 backgroundColor: c.espresso,
@@ -232,66 +217,29 @@ export default function KntoHeader({
                 className="shrink-0 transition-transform duration-300 group-hover:scale-110"
                 size={15}
               />
-
               <span className="truncate">Save Contact</span>
             </button>
 
-            {/* Directions: 30% on mobile */}
-            {mapsUrl && (
-              <a
-                href={mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Open KNTO KLSK directions in Google Maps"
-                className={`${actionBase} col-span-3 gap-1 px-1 text-[9px] tracking-[-0.02em] sm:col-span-auto sm:gap-2 sm:px-5 sm:text-[10px] sm:tracking-[0.1em]`}
-                style={secondaryActionStyle}
-              >
-                <FaMapMarkerAlt
-                  className="shrink-0"
-                  size={13}
-                />
+            {/* Directions — 30% mobile width */}
+            <a
+              href={mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open KNTO KLSK directions"
+              className={`${actionBase} col-span-3 gap-1 px-1 text-[9px] tracking-[-0.02em] sm:gap-2 sm:px-5 sm:text-[10px] sm:tracking-[0.1em]`}
+              style={secondaryActionStyle}
+            >
+              <FaMapMarkerAlt className="shrink-0" size={13} />
+              <span className="truncate">Directions</span>
+              <FaExternalLinkAlt
+                className="hidden shrink-0 sm:block"
+                size={9}
+              />
+            </a>
 
-                <span className="truncate">Directions</span>
-
-                <FaExternalLinkAlt
-                  className="hidden shrink-0 sm:block"
-                  size={9}
-                />
-              </a>
-            )}
-
-            {/* Call */}
-            {profile.phone && (
-              <a
-                href={`tel:${profile.phone.replace(/[^\d+]/g, "")}`}
-                className={`${actionBase} col-span-5 sm:col-span-auto sm:min-w-[110px]`}
-                style={secondaryActionStyle}
-              >
-                <FaPhone
-                  className="shrink-0 transition-transform duration-300 group-hover:rotate-[-8deg]"
-                  size={12}
-                />
-                <span>Call</span>
-              </a>
-            )}
-
-            {/* Email */}
-            {profile.email && (
-              <a
-                href={`mailto:${profile.email}`}
-                className={`${actionBase} col-span-5 sm:col-span-auto sm:min-w-[120px]`}
-                style={secondaryActionStyle}
-              >
-                <FaEnvelope
-                  className="shrink-0 transition-transform duration-300 group-hover:-translate-y-0.5"
-                  size={13}
-                />
-                <span>Email</span>
-              </a>
-            )}
           </div>
 
-          {/* Decorative divider */}
+          {/* DIVIDER */}
           <div
             className="mt-7 h-px w-full sm:mt-8"
             style={{
@@ -299,8 +247,119 @@ export default function KntoHeader({
             }}
           />
 
-          {/* Small brand signature */}
-          <div className="mt-3 flex items-center justify-between gap-3">
+          {/* CONTACT DETAILS */}
+          <div className="mt-5 sm:mt-6">
+            <p
+              className="mb-3 text-[9px] font-semibold uppercase tracking-[0.2em]"
+              style={{ color: c.wood }}
+            >
+              Visit & get in touch
+            </p>
+
+            <div className="grid grid-cols-1 gap-0 sm:grid-cols-2 sm:gap-x-8 lg:grid-cols-3">
+              {/* Email detail */}
+              <a
+                href={`mailto:${contactEmail}`}
+                className="group flex min-w-0 items-start gap-3 border-b py-3 transition-colors sm:border-b-0 sm:py-2"
+                style={{ borderColor: c.line }}
+              >
+                <span
+                  className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center"
+                  style={{
+                    backgroundColor: c.cream,
+                    color: c.wood,
+                  }}
+                >
+                  <FaEnvelope size={13} />
+                </span>
+
+                <span className="min-w-0 flex-1">
+                  <span
+                    className="block text-[8px] font-semibold uppercase tracking-[0.16em]"
+                    style={{ color: c.muted }}
+                  >
+                    Email us
+                  </span>
+                  <span className="mt-1 block break-all text-xs leading-5 transition-colors group-hover:underline group-hover:underline-offset-4">
+                    {contactEmail}
+                  </span>
+                </span>
+              </a>
+
+              {/* Phone detail */}
+              <a
+                href={`tel:${contactPhone.replace(/[^\d+]/g, "")}`}
+                className="group flex min-w-0 items-start gap-3 border-b py-3 transition-colors sm:border-b-0 sm:py-2"
+                style={{ borderColor: c.line }}
+              >
+                <span
+                  className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center"
+                  style={{
+                    backgroundColor: c.cream,
+                    color: c.wood,
+                  }}
+                >
+                  <FaPhone size={13} />
+                </span>
+
+                <span className="min-w-0 flex-1">
+                  <span
+                    className="block text-[8px] font-semibold uppercase tracking-[0.16em]"
+                    style={{ color: c.muted }}
+                  >
+                    Call us
+                  </span>
+                  <span className="mt-1 block text-xs leading-5 transition-colors group-hover:underline group-hover:underline-offset-4">
+                    {contactPhone}
+                  </span>
+                </span>
+              </a>
+
+              {/* Address detail */}
+              <a
+                href={contactMapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex min-w-0 items-start gap-3 border-b py-3 transition-colors sm:col-span-2 sm:border-b-0 sm:py-3 lg:col-span-1"
+                style={{ borderColor: c.line }}
+              >
+                <span
+                  className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center"
+                  style={{
+                    backgroundColor: c.cream,
+                    color: c.wood,
+                  }}
+                >
+                  <FaMapMarkerAlt size={14} />
+                </span>
+
+                <span className="min-w-0 flex-1">
+                  <span
+                    className="block text-[8px] font-semibold uppercase tracking-[0.16em]"
+                    style={{ color: c.muted }}
+                  >
+                    Visit us
+                  </span>
+                  <span className="mt-1 block break-words text-xs leading-5 transition-colors group-hover:underline group-hover:underline-offset-4">
+                    {contactAddress}
+                  </span>
+                  <span
+                    className="mt-1.5 inline-flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-[0.1em]"
+                    style={{ color: c.wood }}
+                  >
+                    Open map
+                    <FaExternalLinkAlt size={8} />
+                  </span>
+                </span>
+              </a>
+            </div>
+          </div>
+
+          {/* BRAND SIGNATURE */}
+          <div
+            className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t pt-3"
+            style={{ borderColor: c.line }}
+          >
             <span
               className="text-[8px] font-medium uppercase tracking-[0.16em] sm:text-[9px] sm:tracking-[0.2em]"
               style={{ color: c.muted }}
