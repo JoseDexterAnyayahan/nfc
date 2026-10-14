@@ -6,6 +6,7 @@ import BusinessOwners from "./templates/BusinessOwners";
 import BusinessNfc from "./templates/BusinessNfc";
 import AuguriTemplate from "./templates/auguri/AuguriTemplate";
 import ChinaBankProfessional from "./templates/china-bank/ChinaBankProfessional";
+import KntoKlsk from "./templates/knto-klsk/KntoKlsk";
 
 export default function BusinessProfile({
   profile,
@@ -30,6 +31,9 @@ export default function BusinessProfile({
 
     case "professional":
       return <ChinaBankProfessional profile={profile} />;
+
+    case "kntoklsk":
+      return <KntoKlsk profile={profile} />;
 
     default:
       return <BusinessBanner profile={profile} />;
