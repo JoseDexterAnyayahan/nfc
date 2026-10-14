@@ -1,10 +1,11 @@
+
 "use client";
 
 import { useCallback } from "react";
 import { Poppins } from "next/font/google";
 import { FaCompactDisc } from "react-icons/fa";
-
 import type { BusinessProfile } from "@/lib/profiles";
+
 import KntoHeader from "./KntoHeader";
 import KntoFeatured from "./KntoFeatured";
 import KntoHours from "./KntoHours";
@@ -22,7 +23,7 @@ const poppins = Poppins({
 function escapeVCard(value: string) {
   return value
     .replace(/\\/g, "\\\\")
-    .replace(/\n/g, "\\n")
+    .replace(/\r\n|\r|\n/g, "\\n")
     .replace(/,/g, "\\,")
     .replace(/;/g, "\\;");
 }
@@ -33,34 +34,65 @@ export default function KntoKlsk({
   profile: BusinessProfile;
 }) {
   const handleSaveContact = useCallback(() => {
+    const businessName = profile.businessName || "KNTO KLSK";
+    const phone = profile.phone || "0966 401 4224";
+    const email = profile.email || "kntoklsk@gmail.com";
+    const address =
+      profile.location ||
+      "2nd Floor, Osmeña cor. Bonifacio St., Ilaya, Calapan City 5200, Calapan, Philippines";
+
+    const profileUrl = "https://dextap.vercel.app/b/knto-klsk";
+
+    const socials = [
+      {
+        platform: "Instagram",
+        url:
+          profile.socials?.find(
+            (social) => social.platform === "instagram",
+          )?.url || "https://www.instagram.com/kntoklsk/",
+      },
+      {
+        platform: "Facebook",
+        url:
+          profile.socials?.find(
+            (social) => social.platform === "facebook",
+          )?.url || "https://www.facebook.com/KntoKlsk/",
+      },
+      {
+        platform: "TikTok",
+        url:
+          profile.socials?.find(
+            (social) => social.platform === "tiktok",
+          )?.url || "https://www.tiktok.com/@knto.klsk",
+      },
+    ];
+
+    const notes = [
+      profile.tagline || "DROP THE NEEDLE. SIP THE MOMENTS.",
+      "Sunday to Thursday: 11:00 AM - 10:00 PM",
+      "Last order: 9:20 PM",
+      "Friday and Saturday: 11:00 AM - 11:00 PM",
+      "Last order: 10:20 PM",
+    ].join("\n");
+
     const lines = [
       "BEGIN:VCARD",
       "VERSION:3.0",
-      `FN:${escapeVCard(profile.businessName)}`,
-      `ORG:${escapeVCard(profile.businessName)}`,
+      `FN:${escapeVCard(businessName)}`,
+      `ORG:${escapeVCard(businessName)}`,
+      `TEL;TYPE=WORK,VOICE:${phone}`,
+      `EMAIL;TYPE=WORK:${email}`,
+      `URL:${profileUrl}`,
+      `ADR;TYPE=WORK:;;${escapeVCard(address)};;;;`,
+      `NOTE:${escapeVCard(notes)}`,
+      ...socials.map(
+        (social) =>
+          `X-SOCIALPROFILE;TYPE=${social.platform.toLowerCase()}:${social.url}`,
+      ),
+      "END:VCARD",
     ];
 
-    if (profile.phone) {
-      lines.push(`TEL;TYPE=WORK,VOICE:${profile.phone}`);
-    }
-
-    if (profile.email) {
-      lines.push(`EMAIL;TYPE=WORK:${profile.email}`);
-    }
-
-    if (profile.website) {
-      lines.push(`URL:${profile.website}`);
-    }
-
-    lines.push("URL:https://dextap.vercel.app/b/knto-klsk");
-
-    if (profile.location) {
-      lines.push(`ADR;TYPE=WORK:;;${escapeVCard(profile.location)};;;;`);
-    }
-
-    lines.push("END:VCARD");
-
-    const blob = new Blob([lines.join("\r\n")], {
+    const blob = new Blob([lines.join("\r\n") + "\r\n"], {
       type: "text/vcard;charset=utf-8",
     });
 
@@ -69,11 +101,12 @@ export default function KntoKlsk({
 
     link.href = url;
     link.download = "KNTO-KLSK.vcf";
+
     document.body.appendChild(link);
     link.click();
     link.remove();
 
-    URL.revokeObjectURL(url);
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }, [profile]);
 
   const handleExplore = () => {
