@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -36,44 +35,70 @@ const featuredPhotos = [
 
 export default function KntoFeatured() {
   const trackRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
 
   const [failedImages, setFailedImages] = useState<string[]>([]);
   const [activePhoto, setActivePhoto] = useState<
     (typeof featuredPhotos)[number] | null
   >(null);
 
-  // Prevent the page behind the enlarged photo from scrolling.
+  /*
+   * While the photo viewer is open:
+   *  - the page behind it can't scroll (html + body overflow locked),
+   *  - the vanishing scrollbar is compensated for so the layout
+   *    doesn't jump sideways,
+   *  - Escape closes the viewer,
+   *  - focus moves to the close button and returns to the photo
+   *    that opened it afterwards.
+   * Everything is restored on close or unmount.
+   */
   useEffect(() => {
     if (!activePhoto) return;
 
-    const previousOverflow = document.body.style.overflow;
-    const previousOverscroll = document.body.style.overscrollBehavior;
-    const previousHtmlOverflow =
-      document.documentElement.style.overflow;
-    const previousHtmlOverscroll =
-      document.documentElement.style.overscrollBehavior;
+    const { body, documentElement } = document;
 
-    document.body.style.overflow = "hidden";
-    document.body.style.overscrollBehavior = "none";
-    document.documentElement.style.overflow = "hidden";
-    document.documentElement.style.overscrollBehavior = "none";
+    const previous = {
+      htmlOverflow: documentElement.style.overflow,
+      bodyOverflow: body.style.overflow,
+      bodyPaddingRight: body.style.paddingRight,
+    };
+
+    const scrollbarWidth = window.innerWidth - documentElement.clientWidth;
+
+    documentElement.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+
+    if (scrollbarWidth > 0) {
+      body.style.paddingRight = `${scrollbarWidth}px`;
+    }
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setActivePhoto(null);
+        return;
+      }
+
+      // The close button is the only focusable element in the
+      // viewer, so keep focus on it instead of the page behind.
+      if (event.key === "Tab") {
+        event.preventDefault();
+        closeButtonRef.current?.focus();
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+
+    closeButtonRef.current?.focus();
 
     return () => {
-      document.body.style.overflow = previousOverflow;
-      document.body.style.overscrollBehavior = previousOverscroll;
-      document.documentElement.style.overflow = previousHtmlOverflow;
-      document.documentElement.style.overscrollBehavior =
-        previousHtmlOverscroll;
+      window.removeEventListener("keydown", handleKeyDown);
 
-      document.removeEventListener("keydown", handleKeyDown);
+      documentElement.style.overflow = previous.htmlOverflow;
+      body.style.overflow = previous.bodyOverflow;
+      body.style.paddingRight = previous.bodyPaddingRight;
+
+      triggerRef.current?.focus();
     };
   }, [activePhoto]);
 
@@ -86,7 +111,7 @@ export default function KntoFeatured() {
 
   const markImageFailed = (src: string) => {
     setFailedImages((current) =>
-      current.includes(src) ? current : [...current, src],
+      current.includes(src) ? current : [...current, src]
     );
   };
 
@@ -100,14 +125,12 @@ export default function KntoFeatured() {
           >
             A taste of the house
           </p>
-
           <h2
             className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl"
             style={{ color: c.ink }}
           >
             Featured moments
           </h2>
-
           <p
             className="mt-2 max-w-md text-xs leading-6 sm:text-sm"
             style={{ color: c.muted }}
@@ -127,7 +150,6 @@ export default function KntoFeatured() {
           >
             <FaChevronLeft size={12} />
           </button>
-
           <button
             type="button"
             aria-label="Next photos"
@@ -140,10 +162,9 @@ export default function KntoFeatured() {
         </div>
       </div>
 
-      {/* Photo gallery */}
       <div
         ref={trackRef}
-        className="flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-4"
+        className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4"
         style={{
           scrollbarWidth: "thin",
           scrollbarColor: `${c.gold} ${c.soft}`,
@@ -156,7 +177,10 @@ export default function KntoFeatured() {
             <button
               key={photo.src}
               type="button"
-              onClick={() => setActivePhoto(photo)}
+              onClick={(event) => {
+                triggerRef.current = event.currentTarget;
+                setActivePhoto(photo);
+              }}
               className="group w-[78%] shrink-0 snap-start text-left sm:w-[48%] lg:w-[32%]"
               aria-label={`View ${photo.title}`}
             >
@@ -189,14 +213,12 @@ export default function KntoFeatured() {
                     >
                       KNTO KLSK · PHOTO {index + 1}
                     </span>
-
                     <span
                       className="mt-5 max-w-[200px] text-xl font-semibold tracking-tight"
                       style={{ color: c.espresso }}
                     >
                       {photo.title}
                     </span>
-
                     <span
                       className="mt-3 text-xs leading-6"
                       style={{ color: c.wood }}
@@ -220,7 +242,6 @@ export default function KntoFeatured() {
                       {photo.caption}
                     </p>
                   </div>
-
                   <FaExpandAlt
                     className="mb-1 shrink-0 opacity-80 transition-transform group-hover:scale-110"
                     size={13}
@@ -242,38 +263,30 @@ export default function KntoFeatured() {
       {/* Enlarged photo viewer */}
       {activePhoto && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-black/90 p-4 overscroll-none sm:p-8"
+          className="fixed inset-0 z-[100] flex items-center justify-center overscroll-contain bg-black/90 p-4 sm:p-8"
           role="dialog"
           aria-modal="true"
           aria-label={activePhoto.title}
           onClick={() => setActivePhoto(null)}
-          onTouchMove={(event) => {
-            // Prevent touch scrolling from reaching the page behind the viewer.
-            if (event.target === event.currentTarget) {
-              event.preventDefault();
-            }
-          }}
         >
           <button
+            ref={closeButtonRef}
             type="button"
             aria-label="Close photo viewer"
             onClick={() => setActivePhoto(null)}
-            className="absolute right-5 top-5 z-10 flex h-11 w-11 items-center justify-center border border-white/30 text-white transition-colors hover:bg-white/10"
+            className="absolute right-5 top-5 flex h-11 w-11 items-center justify-center border border-white/30 text-white transition-colors hover:bg-white/10"
           >
             <FaTimes size={16} />
           </button>
 
           <div
-            className="max-h-full max-w-4xl overscroll-none"
+            className="max-h-full max-w-4xl"
             onClick={(event) => event.stopPropagation()}
           >
             {failedImages.includes(activePhoto.src) ? (
               <div
                 className="flex min-h-64 min-w-64 items-center justify-center p-10 text-center sm:min-w-96"
-                style={{
-                  backgroundColor: c.cream,
-                  color: c.espresso,
-                }}
+                style={{ backgroundColor: c.cream, color: c.espresso }}
               >
                 Photo not added yet.
               </div>
@@ -287,10 +300,7 @@ export default function KntoFeatured() {
             )}
 
             <div className="pt-4 text-white">
-              <h3 className="text-lg font-semibold">
-                {activePhoto.title}
-              </h3>
-
+              <h3 className="text-lg font-semibold">{activePhoto.title}</h3>
               <p className="mt-1 text-sm text-white/70">
                 {activePhoto.caption}
               </p>
