@@ -33,7 +33,7 @@ export default function KntoKlsk({
 }: {
   profile: BusinessProfile;
 }) {
-  const handleSaveContact = useCallback(() => {
+  const handleSaveContact = useCallback(async () => {
     const businessName = profile.businessName || "KNTO KLSK";
     const phone = profile.phone || "0966 401 4224";
     const email = profile.email || "kntoklsk@gmail.com";
@@ -75,6 +75,36 @@ export default function KntoKlsk({
       "Last order: 10:20 PM",
     ].join("\n");
 
+    // Fetch the KNTO KLSK logo from the public folder.
+    let photoLine: string | undefined;
+
+    try {
+      const response = await fetch(
+        "/profiles/business/knto-klsk/knto-logo.jpg",
+      );
+
+      if (response.ok) {
+        const imageBuffer = await response.arrayBuffer();
+        const bytes = new Uint8Array(imageBuffer);
+
+        // Convert the JPEG image to Base64 safely.
+        let binary = "";
+
+        for (let i = 0; i < bytes.length; i += 0x8000) {
+          binary += String.fromCharCode(
+            ...bytes.subarray(i, i + 0x8000),
+          );
+        }
+
+        const base64 = btoa(binary);
+
+        // vCard 3.0 embedded contact photo.
+        photoLine = `PHOTO;ENCODING=b;TYPE=JPEG:${base64}`;
+      }
+    } catch (error) {
+      console.error("Could not load the KNTO KLSK logo:", error);
+    }
+
     const lines = [
       "BEGIN:VCARD",
       "VERSION:3.0",
@@ -89,8 +119,20 @@ export default function KntoKlsk({
         (social) =>
           `X-SOCIALPROFILE;TYPE=${social.platform.toLowerCase()}:${social.url}`,
       ),
-      "END:VCARD",
     ];
+
+    // Fold the Base64 photo line to comply with vCard line-length rules.
+    if (photoLine) {
+      const chunks = photoLine.match(/.{1,75}/g) || [];
+
+      lines.push(
+        chunks
+          .map((chunk, index) => (index === 0 ? chunk : ` ${chunk}`))
+          .join("\r\n"),
+      );
+    }
+
+    lines.push("END:VCARD");
 
     const blob = new Blob([lines.join("\r\n") + "\r\n"], {
       type: "text/vcard;charset=utf-8",
