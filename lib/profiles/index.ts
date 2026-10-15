@@ -48,48 +48,42 @@ export type DentistCredential = {
 export type PersonalProfile = {
   id: string;
   type: "personal";
-
   template:
     | "premium"
     | "personalsocial"
     | "videographer"
     | "insurance"
     | "dentist";
-
   name: string;
   title?: string;
   company?: string;
-
   avatar: string;
   banner?: string;
-
   email: string;
   phone: string;
   whatsapp?: string;
   website?: string;
-
   location?: string;
   locationUrl?: string;
-
   socials?: Social[];
-
   bio?: string;
-
   services?: ProfileService[];
-
   portfolio?: PortfolioItem[];
-
   testimonials?: Testimonial[];
-
   dentistResults?: DentistResult[];
-
   dentistCredentials?: DentistCredential[];
+};
+
+export type BusinessHighlight = {
+  src: string;
+  title: string;
+  caption: string;
+  url: string;
 };
 
 export type BusinessProfile = {
   id: string;
   type: "business";
-
   template:
     | "businessbanner"
     | "businesscoffee"
@@ -97,32 +91,25 @@ export type BusinessProfile = {
     | "businessnfc"
     | "auguri"
     | "kntoklsk"
-    | "professional";
+    | "professional"
+    | "litrato-cafe";
 
   businessName: string;
   tagline?: string;
-
   logo: string;
   banner?: string;
   avatar?: string;
-
   contactName?: string;
   contactTitle?: string;
-
   email: string;
   phone: string;
   whatsapp?: string;
-
   website?: string;
   link?: string;
-
   location?: string;
   locationUrl?: string;
-
   reviewUrl?: string;
-
   socials?: Social[];
-
   bio?: string;
 
   services?: {
@@ -131,6 +118,10 @@ export type BusinessProfile = {
   }[];
 
   hours?: string;
+
+  // Litrato Café featured gallery
+  highlights?: BusinessHighlight[];
+  seeMoreUrl?: string;
 };
 
 import cel from "./personal/cel";
@@ -138,6 +129,7 @@ import dex from "./personal/dex";
 import dexVideographer from "./personal/dex-videographer";
 import insuranceAgent from "./personal/insurance-agent";
 import dentistProfile from "./personal/dentist";
+
 import murdochAssociates from "./business/murdoch-associates";
 import suarezFarms from "./business/suarez-farms";
 import dextap from "./business/dextap";
@@ -145,6 +137,7 @@ import dextapV2 from "./business/dextap-v2";
 import auguri from "./business/auguri";
 import gioManalo from "./business/gio-manalo";
 import kntoKlsk from "./business/knto-klsk";
+import litratoCafe from "./business/litrato-cafe";
 
 const personalProfiles: PersonalProfile[] = [
   cel,
@@ -162,6 +155,7 @@ const businessProfiles: BusinessProfile[] = [
   auguri,
   gioManalo,
   kntoKlsk,
+  litratoCafe,
 ];
 
 export function getPersonalProfile(id: string) {

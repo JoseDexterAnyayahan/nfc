@@ -7,6 +7,7 @@ import BusinessNfc from "./templates/BusinessNfc";
 import AuguriTemplate from "./templates/auguri/AuguriTemplate";
 import ChinaBankProfessional from "./templates/china-bank/ChinaBankProfessional";
 import KntoKlsk from "./templates/knto-klsk/KntoKlsk";
+import LitratoCafe from "./templates/litrato-cafe/LitratoCafe";
 
 export default function BusinessProfile({
   profile,
@@ -34,6 +35,9 @@ export default function BusinessProfile({
 
     case "kntoklsk":
       return <KntoKlsk profile={profile} />;
+
+    case "litrato-cafe":
+      return <LitratoCafe profile={profile} />;
 
     default:
       return <BusinessBanner profile={profile} />;
