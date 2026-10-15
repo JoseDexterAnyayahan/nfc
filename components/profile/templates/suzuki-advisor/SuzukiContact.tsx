@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -10,10 +9,7 @@ import {
   FaPhoneAlt,
 } from "react-icons/fa";
 import type { BusinessProfile } from "@/lib/profiles";
-import {
-  suzukiContainerClass,
-  suzukiSectionClass,
-} from "./suzuki-styles";
+import { suzukiContainerClass, suzukiSectionClass } from "./suzuki-styles";
 
 type Props = {
   profile: BusinessProfile;
@@ -21,7 +17,7 @@ type Props = {
 
 export default function SuzukiContact({ profile }: Props) {
   const facebookUrl = profile.socials?.find(
-    (social) => social.platform === "facebook"
+    (social) => social.platform === "facebook",
   )?.url;
 
   const phone = profile.phone.replace(/[^\d+]/g, "");
@@ -100,9 +96,7 @@ export default function SuzukiContact({ profile }: Props) {
               >
                 <span
                   className={`absolute inset-x-0 top-0 h-[3px] origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100 ${
-                    isRed
-                      ? "bg-[var(--suzuki-red)]"
-                      : "bg-[var(--suzuki-blue)]"
+                    isRed ? "bg-[var(--suzuki-red)]" : "bg-[var(--suzuki-blue)]"
                   }`}
                 />
 
@@ -125,7 +119,10 @@ export default function SuzukiContact({ profile }: Props) {
                     {item.title}
                   </span>
 
-                  <span className="mt-1 block break-words text-sm text-[var(--suzuki-muted)]">
+                  <span
+                    className="mt-1 block min-w-0 truncate text-sm text-[var(--suzuki-muted)]"
+                    title={item.label === "EMAIL" ? item.detail : undefined}
+                  >
                     {item.detail}
                   </span>
 
@@ -209,8 +206,8 @@ export default function SuzukiContact({ profile }: Props) {
           <span className="mt-0.5 h-8 w-1 shrink-0 rounded-full bg-[var(--suzuki-red)] sm:mt-0" />
 
           <p className="text-xs leading-6 text-[var(--suzuki-muted)] sm:text-sm">
-            Prefer a quick conversation? Call or email me directly, and I&apos;ll
-            be happy to assist with your inquiry.
+            Prefer a quick conversation? Call or email me directly, and
+            I&apos;ll be happy to assist with your inquiry.
           </p>
         </div>
       </div>
