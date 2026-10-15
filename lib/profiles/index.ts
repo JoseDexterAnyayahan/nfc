@@ -92,7 +92,8 @@ export type BusinessProfile = {
     | "auguri"
     | "kntoklsk"
     | "professional"
-    | "litrato-cafe";
+    | "litrato-cafe"
+    | "suzuki-advisor";
 
   businessName: string;
   tagline?: string;
@@ -138,6 +139,7 @@ import auguri from "./business/auguri";
 import gioManalo from "./business/gio-manalo";
 import kntoKlsk from "./business/knto-klsk";
 import litratoCafe from "./business/litrato-cafe";
+import { suzukiAdvisorProfile } from "./business/suzuki-advisor";
 
 const personalProfiles: PersonalProfile[] = [
   cel,
@@ -156,6 +158,7 @@ const businessProfiles: BusinessProfile[] = [
   gioManalo,
   kntoKlsk,
   litratoCafe,
+  suzukiAdvisorProfile,
 ];
 
 export function getPersonalProfile(id: string) {

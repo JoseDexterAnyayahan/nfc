@@ -8,6 +8,7 @@ import AuguriTemplate from "./templates/auguri/AuguriTemplate";
 import ChinaBankProfessional from "./templates/china-bank/ChinaBankProfessional";
 import KntoKlsk from "./templates/knto-klsk/KntoKlsk";
 import LitratoCafe from "./templates/litrato-cafe/LitratoCafe";
+import SuzukiAdvisor from "./templates/suzuki-advisor/SuzukiAdvisor";
 
 export default function BusinessProfile({
   profile,
@@ -38,6 +39,9 @@ export default function BusinessProfile({
 
     case "litrato-cafe":
       return <LitratoCafe profile={profile} />;
+
+    case "suzuki-advisor":
+      return <SuzukiAdvisor profile={profile} />;
 
     default:
       return <BusinessBanner profile={profile} />;
