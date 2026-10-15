@@ -1,14 +1,9 @@
-
 "use client";
 
 import { useCallback } from "react";
 import type { BusinessProfile } from "@/lib/profiles";
 import { Poppins } from "next/font/google";
-import {
-  FaArrowRight,
-  FaMapMarkerAlt,
-  FaRegAddressCard,
-} from "react-icons/fa";
+import { FaArrowRight, FaMapMarkerAlt, FaRegAddressCard } from "react-icons/fa";
 
 import SuzukiHero from "./SuzukiHero";
 import SuzukiContact from "./SuzukiContact";
@@ -33,12 +28,10 @@ type Props = {
   profile: BusinessProfile;
 };
 
-const DEFAULT_MAP_URL =
-  "https://maps.app.goo.gl/r18QAyNbBniHH6kA6";
+const DEFAULT_MAP_URL = "https://maps.app.goo.gl/r18QAyNbBniHH6kA6";
 
 const DEALERSHIP_NAME = "Suzuki Auto Calapan";
-const DEALERSHIP_ADDRESS =
-  "Suzuki Auto Calapan, Oriental Mindoro";
+const DEALERSHIP_ADDRESS = "Suzuki Auto Calapan, Oriental Mindoro";
 
 /**
  * Escapes text values for vCard 3.0.
@@ -200,8 +193,7 @@ async function getAvatarPhoto(
         resolve(encoded);
       };
 
-      reader.onerror = () =>
-        reject(new Error("Unable to read avatar image."));
+      reader.onerror = () => reject(new Error("Unable to read avatar image."));
 
       reader.readAsDataURL(blob);
     });
@@ -261,28 +253,21 @@ export default function SuzukiAdvisor({ profile }: Props) {
     }
 
     // Save the dealership location as a structured address.
-    lines.push(
-      `ADR;TYPE=WORK:;;${escapeVCard(address)};;;;`,
-    );
+    lines.push(`ADR;TYPE=WORK:;;${escapeVCard(address)};;;;`);
 
     // Keep the map link separate from any personal website.
-    lines.push(
-      `NOTE:${escapeVCard(`Dealership directions: ${mapUrl}`)}`,
-    );
+    lines.push(`NOTE:${escapeVCard(`Dealership directions: ${mapUrl}`)}`);
 
     // Include the profile avatar in the actual contact file when possible.
     const photo = await getAvatarPhoto(profile.avatar);
 
     if (photo) {
-      lines.push(
-        `PHOTO;ENCODING=b;TYPE=${photo.type}:${photo.base64}`,
-      );
+      lines.push(`PHOTO;ENCODING=b;TYPE=${photo.type}:${photo.base64}`);
     }
 
     lines.push("END:VCARD");
 
-    const vcard =
-      lines.map(foldVCardLine).join("\r\n") + "\r\n";
+    const vcard = lines.map(foldVCardLine).join("\r\n") + "\r\n";
 
     const blob = new Blob([vcard], {
       type: "text/vcard;charset=utf-8",
@@ -317,13 +302,10 @@ export default function SuzukiAdvisor({ profile }: Props) {
     <main
       id="top"
       style={suzukiProfileVariables}
-      className={`${poppins.className} ${suzukiProfileClassName} min-h-screen bg-[var(--suzuki-page)] pb-28 text-[var(--suzuki-text)] transition-colors duration-300`}
+      className={`${poppins.className} ${suzukiProfileClassName} min-h-screen bg-[var(--suzuki-page)] pb-20 text-[var(--suzuki-text)] transition-colors duration-300`}
     >
       {/* Hero and primary actions */}
-      <SuzukiHero
-        profile={profile}
-        onSaveContact={saveContact}
-      />
+      <SuzukiHero profile={profile} onSaveContact={saveContact} />
 
       {/* Contact information */}
       <SuzukiContact profile={profile} />
@@ -355,9 +337,9 @@ export default function SuzukiAdvisor({ profile }: Props) {
                 </h2>
 
                 <p className="mt-3 max-w-sm text-sm leading-7 text-white/80">
-                  Keep Jhon&apos;s contact details handy for your next
-                  service inquiry. Save his information or visit the
-                  dealership when you need assistance.
+                  Keep Jhon&apos;s contact details handy for your next service
+                  inquiry. Save his information or visit the dealership when you
+                  need assistance.
                 </p>
               </div>
 
@@ -431,23 +413,17 @@ export default function SuzukiAdvisor({ profile }: Props) {
                 </span>
 
                 <p className="text-xs leading-5 text-[var(--suzuki-muted)]">
-                  Open the map for the dealership location and
-                  directions.
+                  Open the map for the dealership location and directions.
                 </p>
               </div>
             </div>
           </div>
         </div>
       </section>
-
+      {/* Floating actions reuse the exact same saveContact function */}
+      <SuzukiFloatingActions profile={profile} onSaveContact={saveContact} />
       {/* Footer */}
       <SuzukiFooter profile={profile} />
-
-      {/* Floating actions reuse the exact same saveContact function */}
-      <SuzukiFloatingActions
-        profile={profile}
-        onSaveContact={saveContact}
-      />
     </main>
   );
 }

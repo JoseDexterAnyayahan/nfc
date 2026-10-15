@@ -1,12 +1,7 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  FaDownload,
-  FaEnvelope,
-  FaPhoneAlt,
-} from "react-icons/fa";
+import { FaDownload, FaEnvelope, FaPhoneAlt } from "react-icons/fa";
 import type { BusinessProfile } from "@/lib/profiles";
 import { FaUserPlus } from "react-icons/fa6";
 
@@ -27,7 +22,6 @@ export default function SuzukiFloatingActions({
     };
 
     handleScroll();
-
     window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
