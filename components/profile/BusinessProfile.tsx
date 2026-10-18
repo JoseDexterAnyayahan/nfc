@@ -9,6 +9,7 @@ import ChinaBankProfessional from "./templates/china-bank/ChinaBankProfessional"
 import KntoKlsk from "./templates/knto-klsk/KntoKlsk";
 import LitratoCafe from "./templates/litrato-cafe/LitratoCafe";
 import SuzukiAdvisor from "./templates/suzuki-advisor/SuzukiAdvisor";
+import TamtechWendell from "./templates/tamtech-wendell/TamtechWendell";
 
 export default function BusinessProfile({
   profile,
@@ -42,6 +43,9 @@ export default function BusinessProfile({
 
     case "suzuki-advisor":
       return <SuzukiAdvisor profile={profile} />;
+
+    case "tamtech-wendell":
+      return <TamtechWendell profile={profile} />;
 
     default:
       return <BusinessBanner profile={profile} />;
