@@ -45,7 +45,7 @@ export default function TamtechLocation({ profile }: Props) {
     profile.locationUrl ||
     `https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}`;
 
-  const viewMapUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
+  const viewMapUrl = `https://maps.app.goo.gl/g5xJjFdiHWCVqvQs8`;
 
   const copyAddress = async () => {
     try {

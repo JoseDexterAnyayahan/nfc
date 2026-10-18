@@ -27,7 +27,7 @@ const tamtechWendell: BusinessProfile = {
     "5th Floor, Megalife Building, Juan Luna Street, San Vicente, Calapan City, Oriental Mindoro 5200, Philippines",
 
   locationUrl:
-    "https://www.google.com/maps/search/?api=1&query=5th+Floor+Megalife+Building+Juan+Luna+Street+San+Vicente+Calapan+City+Oriental+Mindoro",
+    "https://maps.app.goo.gl/g5xJjFdiHWCVqvQs8",
 
   socials: [
     {
