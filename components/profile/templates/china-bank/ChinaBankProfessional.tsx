@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from "next/image";
@@ -11,7 +10,6 @@ import {
   ArrowUpRight,
   BriefcaseBusiness,
   Copy,
-  Image as ImageIcon,
   Landmark,
   Loader2,
   Mail,
@@ -44,6 +42,9 @@ const DEFAULT_BRANCH = "China Bank Savings Calapan Branch";
 /*
  * =============================================================
  * SERVICES
+ * -------------------------------------------------------------
+ * Edit these freely. The copy is intentionally general — swap in
+ * the exact products and wording you want to promote.
  * =============================================================
  */
 
@@ -74,6 +75,12 @@ const SERVICES = [
 /*
  * =============================================================
  * COLORS
+ * -------------------------------------------------------------
+ * This profile is dark-mode only, by request — there is no light
+ * palette and no toggle. Colors are still CSS variables (declared
+ * once in the <style> block below) rather than hex strings, which
+ * just keeps the rest of the component tidy; they no longer vary
+ * by theme at all.
  * =============================================================
  */
 
@@ -168,6 +175,8 @@ async function imageToBase64(
 /*
  * =============================================================
  * CONTACT ROW
+ * The main area is the link; the copy button sits beside it (a
+ * button can't live inside an anchor).
  * =============================================================
  */
 
@@ -256,7 +265,6 @@ function ContactRow({
 
 export default function ChinaBankProfessional({ profile }: Props) {
   const [saving, setSaving] = useState(false);
-  const [downloadingPoster, setDownloadingPoster] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [showBar, setShowBar] = useState(false);
 
@@ -265,7 +273,8 @@ export default function ChinaBankProfessional({ profile }: Props) {
 
   /*
    * The floating action bar stays hidden until the hero actions
-   * have scrolled out of view above the viewport.
+   * have scrolled out of view above the viewport — so it never
+   * duplicates buttons that are already on screen.
    */
   useEffect(() => {
     const node = heroActionsRef.current;
@@ -307,9 +316,13 @@ export default function ChinaBankProfessional({ profile }: Props) {
    */
 
   const businessName = profile.businessName || DEFAULT_BRANCH;
+
   const contactName = profile.contactName || "Gio Manalo";
+
   const contactTitle = profile.contactTitle || "Business Manager";
+
   const phone = profile.phone || "09399796582";
+
   const email = profile.email || "eamanalo.cbs@chinabank.ph";
 
   const banner =
@@ -383,13 +396,6 @@ export default function ChinaBankProfessional({ profile }: Props) {
     await copyText(url, "Profile link");
   };
 
-  /*
-   * =========================================================
-   * SAVE CONTACT
-   * Creates a vCard with the profile avatar embedded.
-   * =========================================================
-   */
-
   const handleSaveContact = async () => {
     if (saving) return;
 
@@ -407,13 +413,21 @@ export default function ChinaBankProfessional({ profile }: Props) {
       const lines = [
         "BEGIN:VCARD",
         "VERSION:3.0",
+
         `FN:${escapeVCardValue(contactName)}`,
+
         `N:${escapeVCardValue(lastName)};${escapeVCardValue(firstName)};;;`,
+
         `ORG:${escapeVCardValue(businessName)}`,
+
         `TITLE:${escapeVCardValue(contactTitle)}`,
+
         `TEL;TYPE=CELL:${escapeVCardValue(phone)}`,
+
         `EMAIL;TYPE=INTERNET:${escapeVCardValue(email)}`,
+
         `URL:${profileUrl}`,
+
         "NOTE:Other Business - Auguri",
       ];
 
@@ -426,9 +440,7 @@ export default function ChinaBankProfessional({ profile }: Props) {
           ? "PNG"
           : "JPEG";
 
-        lines.push(
-          `PHOTO;ENCODING=b;TYPE=${imageType}:${avatarData.base64}`,
-        );
+        lines.push(`PHOTO;ENCODING=b;TYPE=${imageType}:${avatarData.base64}`);
       }
 
       lines.push("END:VCARD");
@@ -438,16 +450,20 @@ export default function ChinaBankProfessional({ profile }: Props) {
       });
 
       const url = URL.createObjectURL(blob);
+
       const link = document.createElement("a");
 
       link.href = url;
+
       link.download = `${contactName
         .replace(/[^\w\s-]/g, "")
         .replace(/\s+/g, "-")
         .toLowerCase()}.vcf`;
 
       document.body.appendChild(link);
+
       link.click();
+
       document.body.removeChild(link);
 
       window.setTimeout(() => {
@@ -457,223 +473,10 @@ export default function ChinaBankProfessional({ profile }: Props) {
       showToast("Contact card ready");
     } catch (error) {
       console.error("Failed to create contact:", error);
+
       showToast("Couldn't create the contact. Please try again.");
     } finally {
       setSaving(false);
-    }
-  };
-
-  /*
-   * =========================================================
-   * DOWNLOAD CONTACT POSTER
-   *
-   * Generates a portrait PNG using the existing profile data.
-   * This image must still be applied manually in iPhone Contacts.
-   * =========================================================
-   */
-
-  const handleDownloadPoster = async () => {
-    if (downloadingPoster) return;
-
-    setDownloadingPoster(true);
-
-    try {
-      const avatarData = avatar ? await imageToBase64(avatar) : null;
-
-      if (!avatarData) {
-        showToast("Couldn't load the profile photo.");
-        return;
-      }
-
-      const canvas = document.createElement("canvas");
-      canvas.width = 1080;
-      canvas.height = 1920;
-
-      const ctx = canvas.getContext("2d");
-
-      if (!ctx) {
-        showToast("Couldn't create the poster.");
-        return;
-      }
-
-      // Background
-      const background = ctx.createLinearGradient(0, 0, 1080, 1920);
-      background.addColorStop(0, "#101010");
-      background.addColorStop(1, "#24201b");
-
-      ctx.fillStyle = background;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Red and gold brand accents
-      ctx.fillStyle = "#e01e1c";
-      ctx.fillRect(0, 0, canvas.width, 14);
-
-      ctx.fillStyle = "#f8d346";
-      ctx.fillRect(0, 14, canvas.width, 5);
-
-      // DexTap branding
-      ctx.textAlign = "center";
-      ctx.textBaseline = "alphabetic";
-
-      ctx.fillStyle = "#f8d346";
-      ctx.font = "600 34px Arial";
-      ctx.fillText("DEXTAP", 540, 145);
-
-      ctx.fillStyle = "#aaa9a3";
-      ctx.font = "24px Arial";
-      ctx.fillText("PROFESSIONAL CONTACT", 540, 190);
-
-      // Load the avatar image
-      const photo = new window.Image();
-
-      photo.src = `data:${avatarData.mimeType};base64,${avatarData.base64}`;
-
-      await new Promise<void>((resolve, reject) => {
-        photo.onload = () => resolve();
-        photo.onerror = () => reject(new Error("Photo failed to load"));
-      });
-
-      // Circular photo with gold and red border
-      const centerX = 540;
-      const centerY = 600;
-      const radius = 205;
-
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius + 12, 0, Math.PI * 2);
-      ctx.fillStyle = "#f8d346";
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius + 5, 0, Math.PI * 2);
-      ctx.fillStyle = "#e01e1c";
-      ctx.fill();
-
-      ctx.save();
-
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-      ctx.clip();
-
-      const scale = Math.max(
-        (radius * 2) / photo.naturalWidth,
-        (radius * 2) / photo.naturalHeight,
-      );
-
-      const photoWidth = photo.naturalWidth * scale;
-      const photoHeight = photo.naturalHeight * scale;
-
-      ctx.drawImage(
-        photo,
-        centerX - photoWidth / 2,
-        centerY - photoHeight / 2,
-        photoWidth,
-        photoHeight,
-      );
-
-      ctx.restore();
-
-      // Name — wrap long names onto additional lines
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 58px Arial";
-
-      const nameWords = contactName.split(/\s+/);
-      const maxNameWidth = 940;
-      const nameLines: string[] = [];
-      let currentLine = "";
-
-      for (const word of nameWords) {
-        const testLine = currentLine ? `${currentLine} ${word}` : word;
-
-        if (
-          ctx.measureText(testLine).width > maxNameWidth &&
-          currentLine
-        ) {
-          nameLines.push(currentLine);
-          currentLine = word;
-        } else {
-          currentLine = testLine;
-        }
-      }
-
-      if (currentLine) nameLines.push(currentLine);
-
-      let nameY = 960;
-
-      nameLines.forEach((line) => {
-        ctx.fillText(line, 540, nameY, maxNameWidth);
-        nameY += 76;
-      });
-
-      // Position
-      ctx.fillStyle = "#f8d346";
-      ctx.font = "32px Arial";
-      ctx.fillText(contactTitle, 540, nameY + 12, 940);
-
-      // Company
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "600 30px Arial";
-      ctx.fillText(businessName, 540, nameY + 100, 940);
-
-      // Location
-      ctx.fillStyle = "#aaa9a3";
-      ctx.font = "25px Arial";
-      ctx.fillText(location, 540, nameY + 150, 940);
-
-      // Divider
-      ctx.fillStyle = "#343434";
-      ctx.fillRect(180, 1550, 720, 2);
-
-      // Contact details
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "27px Arial";
-      ctx.fillText(phone, 540, 1620, 940);
-      ctx.fillText(email, 540, 1675, 940);
-
-      // Tagline and footer
-      ctx.fillStyle = "#e01e1c";
-      ctx.fillRect(0, 1880, canvas.width, 40);
-
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "24px Arial";
-      ctx.fillText("TAP. SHARE. CONNECT.", 540, 1850);
-
-      // Export PNG
-      const blob = await new Promise<Blob>((resolve, reject) => {
-        canvas.toBlob(
-          (result) => {
-            if (result) {
-              resolve(result);
-            } else {
-              reject(new Error("Poster export failed"));
-            }
-          },
-          "image/png",
-        );
-      });
-
-      const posterUrl = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-
-      link.href = posterUrl;
-      link.download = `${contactName
-        .replace(/[^\w\s-]/g, "")
-        .replace(/\s+/g, "-")
-        .toLowerCase()}-contact-poster.png`;
-
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      window.setTimeout(() => {
-        URL.revokeObjectURL(posterUrl);
-      }, 1000);
-
-      showToast("Contact poster downloaded");
-    } catch (error) {
-      console.error("Failed to create contact poster:", error);
-      showToast("Couldn't create the poster. Please try again.");
-    } finally {
-      setDownloadingPoster(false);
     }
   };
 
@@ -720,6 +523,10 @@ export default function ChinaBankProfessional({ profile }: Props) {
         color: colors.text,
       }}
     >
+      {/*
+        Theme variables + motion. Dark-only by request: one fixed
+        palette, no :root/.dark split and no toggle anywhere below.
+      */}
       <style>{`
         :root {
           --cb-page: #101010;
@@ -789,7 +596,9 @@ export default function ChinaBankProfessional({ profile }: Props) {
         }
       `}</style>
 
-      {/* TOP BAR */}
+      {/* =====================================================
+          TOP BAR
+      ====================================================== */}
 
       <header
         className="sticky top-0 z-50 border-b backdrop-blur-xl"
@@ -840,7 +649,9 @@ export default function ChinaBankProfessional({ profile }: Props) {
         </div>
       </header>
 
-      {/* HERO / PROFILE */}
+      {/* =====================================================
+    HERO / PROFILE
+====================================================== */}
 
       <section className="mx-auto w-full max-w-xl px-4 pb-8 pt-5 sm:px-6 sm:pt-8">
         <div
@@ -850,6 +661,7 @@ export default function ChinaBankProfessional({ profile }: Props) {
             borderColor: colors.border,
           }}
         >
+          {/* China Bank Savings banner */}
           <div className="relative h-44 overflow-hidden sm:h-52">
             <Image
               src={banner}
@@ -868,6 +680,7 @@ export default function ChinaBankProfessional({ profile }: Props) {
               }}
             />
 
+            {/* The chip always sits on white, so it uses a fixed red. */}
             <div
               className="absolute left-5 top-5 flex items-center gap-2 rounded-full px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em]"
               style={{
@@ -879,6 +692,7 @@ export default function ChinaBankProfessional({ profile }: Props) {
               Professional
             </div>
 
+            {/* Brand stripe */}
             <div
               className="absolute inset-x-0 bottom-0 flex h-1"
               aria-hidden="true"
@@ -894,6 +708,7 @@ export default function ChinaBankProfessional({ profile }: Props) {
             </div>
           </div>
 
+          {/* Avatar — a two-tone brand ring */}
           <div className="relative flex justify-center">
             <div
               className="relative -mt-16 h-[134px] w-[134px] rounded-full p-[3px] shadow-xl sm:h-[150px] sm:w-[150px]"
@@ -957,8 +772,10 @@ export default function ChinaBankProfessional({ profile }: Props) {
               />
             </div>
 
+            {/* Main actions */}
             <div ref={heroActionsRef} className="mt-7">
               <div className="grid grid-cols-2 gap-2.5">
+                {/* Call */}
                 <a
                   href={phoneHref}
                   className={primaryButtonClass}
@@ -971,6 +788,7 @@ export default function ChinaBankProfessional({ profile }: Props) {
                   Call
                 </a>
 
+                {/* Email */}
                 <a
                   href={`mailto:${email}`}
                   className={secondaryButtonClass}
@@ -989,7 +807,9 @@ export default function ChinaBankProfessional({ profile }: Props) {
         </div>
       </section>
 
-      {/* PROFESSIONAL INFO */}
+      {/* =====================================================
+          PROFESSIONAL INFO
+      ====================================================== */}
 
       <section
         aria-labelledby="cb-work-profile"
@@ -1062,7 +882,9 @@ export default function ChinaBankProfessional({ profile }: Props) {
         </div>
       </section>
 
-      {/* EXPERTISE */}
+      {/* =====================================================
+          EXPERTISE
+      ====================================================== */}
 
       <section
         aria-labelledby="cb-expertise"
@@ -1114,7 +936,9 @@ export default function ChinaBankProfessional({ profile }: Props) {
         </div>
       </section>
 
-      {/* CONTACT */}
+      {/* =====================================================
+          CONTACT
+      ====================================================== */}
 
       <section
         aria-labelledby="cb-contact"
@@ -1161,7 +985,9 @@ export default function ChinaBankProfessional({ profile }: Props) {
         </div>
       </section>
 
-      {/* BRANCH */}
+      {/* =====================================================
+          BRANCH
+      ====================================================== */}
 
       <section
         aria-labelledby="cb-branch"
@@ -1242,7 +1068,9 @@ export default function ChinaBankProfessional({ profile }: Props) {
         </div>
       </section>
 
-      {/* AUGURI */}
+      {/* =====================================================
+          AUGURI — LOW KEY
+      ====================================================== */}
 
       <section className="mx-auto max-w-xl px-4 py-5 sm:px-6">
         <a
@@ -1293,7 +1121,9 @@ export default function ChinaBankProfessional({ profile }: Props) {
         </a>
       </section>
 
-      {/* CLOSING CTA */}
+      {/* =====================================================
+          CLOSING CTA
+      ====================================================== */}
 
       <section className="mx-auto max-w-xl px-4 pb-8 pt-5 sm:px-6">
         <div
@@ -1329,35 +1159,12 @@ export default function ChinaBankProfessional({ profile }: Props) {
             {saveIcon}
             {saveLabel}
           </button>
-
-          {/* NEW: DOWNLOAD CONTACT POSTER */}
-
-          <button
-            type="button"
-            onClick={handleDownloadPoster}
-            disabled={downloadingPoster}
-            aria-busy={downloadingPoster}
-            className={`${secondaryButtonClass} mt-3 w-full`}
-            style={{
-              borderColor: colors.border,
-              backgroundColor: colors.cardSoft,
-              color: colors.text,
-            }}
-          >
-            {downloadingPoster ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : (
-              <ImageIcon size={16} />
-            )}
-
-            {downloadingPoster
-              ? "Preparing Poster…"
-              : "Download Contact Poster"}
-          </button>
         </div>
       </section>
 
-      {/* FOOTER */}
+      {/* =====================================================
+          FOOTER
+      ====================================================== */}
 
       <footer className="px-6 pb-28 pt-4 text-center">
         <div
@@ -1392,7 +1199,10 @@ export default function ChinaBankProfessional({ profile }: Props) {
         </div>
       </footer>
 
-      {/* FLOATING ACTION BAR */}
+      {/* =====================================================
+          FLOATING ACTION BAR
+          Hidden until the hero actions scroll out of view.
+      ====================================================== */}
 
       <div
         className={`
@@ -1449,7 +1259,9 @@ export default function ChinaBankProfessional({ profile }: Props) {
         </div>
       </div>
 
-      {/* TOAST */}
+      {/* =====================================================
+          TOAST
+      ====================================================== */}
 
       <div
         role="status"
