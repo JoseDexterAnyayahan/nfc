@@ -137,3 +137,22 @@ body {
   margin: 0;
 }
 
+
+/* PIXEEPLATES horizontal carousel */
+.pixee-carousel {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(214, 181, 109, 0.45) transparent;
+}
+
+.pixee-carousel::-webkit-scrollbar {
+  height: 4px;
+}
+
+.pixee-carousel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.pixee-carousel::-webkit-scrollbar-thumb {
+  background: rgba(214, 181, 109, 0.45);
+  border-radius: 999px;
+}

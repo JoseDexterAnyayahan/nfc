@@ -94,7 +94,8 @@ export type BusinessProfile = {
     | "professional"
     | "litrato-cafe"
     | "suzuki-advisor"
-    | "tamtech-wendell";
+    | "tamtech-wendell"
+    | "pixeeplates";
 
   businessName: string;
   tagline?: string;
@@ -141,6 +142,7 @@ import gioManalo from "./business/gio-manalo";
 import kntoKlsk from "./business/knto-klsk";
 import litratoCafe from "./business/litrato-cafe";
 import tamtechWendell from "./business/tamtech-wendell";
+import pixeeplates from "./business/pixeeplates";
 import { suzukiAdvisorProfile } from "./business/suzuki-advisor";
 
 const personalProfiles: PersonalProfile[] = [
@@ -162,6 +164,7 @@ const businessProfiles: BusinessProfile[] = [
   litratoCafe,
   suzukiAdvisorProfile,
   tamtechWendell,
+  pixeeplates,
 ];
 
 export function getPersonalProfile(id: string) {

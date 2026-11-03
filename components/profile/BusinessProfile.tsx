@@ -10,6 +10,7 @@ import KntoKlsk from "./templates/knto-klsk/KntoKlsk";
 import LitratoCafe from "./templates/litrato-cafe/LitratoCafe";
 import SuzukiAdvisor from "./templates/suzuki-advisor/SuzukiAdvisor";
 import TamtechWendell from "./templates/tamtech-wendell/TamtechWendell";
+import PixeePlates from "./templates/PixeePlates/PixeePlates";
 
 export default function BusinessProfile({
   profile,
@@ -46,6 +47,9 @@ export default function BusinessProfile({
 
     case "tamtech-wendell":
       return <TamtechWendell profile={profile} />;
+
+    case "pixeeplates":
+      return <PixeePlates profile={profile} />;
 
     default:
       return <BusinessBanner profile={profile} />;
