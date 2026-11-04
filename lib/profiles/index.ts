@@ -1,3 +1,4 @@
+
 export type Social = {
   platform:
     | "facebook"
@@ -95,7 +96,8 @@ export type BusinessProfile = {
     | "litrato-cafe"
     | "suzuki-advisor"
     | "tamtech-wendell"
-    | "pixeeplates";
+    | "pixeeplates"
+    | "ghie-larracas";
 
   businessName: string;
   tagline?: string;
@@ -127,12 +129,14 @@ export type BusinessProfile = {
   seeMoreUrl?: string;
 };
 
+// Personal profiles
 import cel from "./personal/cel";
 import dex from "./personal/dex";
 import dexVideographer from "./personal/dex-videographer";
 import insuranceAgent from "./personal/insurance-agent";
 import dentistProfile from "./personal/dentist";
 
+// Business profiles
 import murdochAssociates from "./business/murdoch-associates";
 import suarezFarms from "./business/suarez-farms";
 import dextap from "./business/dextap";
@@ -144,6 +148,7 @@ import litratoCafe from "./business/litrato-cafe";
 import tamtechWendell from "./business/tamtech-wendell";
 import pixeeplates from "./business/pixeeplates";
 import { suzukiAdvisorProfile } from "./business/suzuki-advisor";
+import { ghieLarracas } from "./business/ghie-larracas";
 
 const personalProfiles: PersonalProfile[] = [
   cel,
@@ -164,6 +169,7 @@ const businessProfiles: BusinessProfile[] = [
   litratoCafe,
   suzukiAdvisorProfile,
   tamtechWendell,
+  ghieLarracas,
   pixeeplates,
 ];
 

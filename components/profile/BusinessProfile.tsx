@@ -11,6 +11,7 @@ import LitratoCafe from "./templates/litrato-cafe/LitratoCafe";
 import SuzukiAdvisor from "./templates/suzuki-advisor/SuzukiAdvisor";
 import TamtechWendell from "./templates/tamtech-wendell/TamtechWendell";
 import PixeePlates from "./templates/PixeePlates/PixeePlates";
+import GhieLarracas from "./templates/GhieLarracas/GhieLarracas";
 
 export default function BusinessProfile({
   profile,
@@ -50,6 +51,9 @@ export default function BusinessProfile({
 
     case "pixeeplates":
       return <PixeePlates profile={profile} />;
+
+    case "ghie-larracas":
+      return <GhieLarracas profile={profile} />;
 
     default:
       return <BusinessBanner profile={profile} />;
