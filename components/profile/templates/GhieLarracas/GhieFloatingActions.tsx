@@ -53,10 +53,10 @@ export default function GhieFloatingActions({ profile }: Props) {
     <>
       {/* Floating Contact Actions */}
       <div
-        className={`fixed inset-x-0 bottom-0 z-50 px-4 pb-[max(16px,env(safe-area-inset-bottom))] transition-all duration-300 ${
+        className={`fixed bottom-0 left-0 right-0 z-50 w-full px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 transition-all duration-300 ${
           isVisible
             ? "translate-y-0 opacity-100"
-            : "pointer-events-none translate-y-8 opacity-0"
+            : "pointer-events-none translate-y-full opacity-0"
         }`}
       >
         <nav
@@ -78,7 +78,7 @@ export default function GhieFloatingActions({ profile }: Props) {
 
           {/* Call */}
           <a
-            href={`tel:${profile.phone}`}
+            href={profile.phone ? `tel:${profile.phone}` : undefined}
             aria-label="Call Ghie"
             className="flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl bg-[var(--ghie-surface)] px-2 py-3 text-[var(--ghie-blue)] transition-all duration-200 hover:bg-[var(--ghie-blue)] hover:text-white active:scale-[0.97]"
           >
@@ -90,7 +90,7 @@ export default function GhieFloatingActions({ profile }: Props) {
 
           {/* Email */}
           <a
-            href={`mailto:${profile.email}`}
+            href={profile.email ? `mailto:${profile.email}` : undefined}
             aria-label="Email Ghie"
             className="flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl bg-[var(--ghie-surface)] px-2 py-3 text-[var(--ghie-blue)] transition-all duration-200 hover:bg-[var(--ghie-blue)] hover:text-white active:scale-[0.97]"
           >
