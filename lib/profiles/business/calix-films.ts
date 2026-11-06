@@ -1,7 +1,7 @@
 import type { BusinessProfile } from "@/lib/profiles";
 
 const calixFilms: BusinessProfile = {
-  id: "C8xK42Lm",
+  id: "CalixFilms",
   type: "business",
   template: "calix-films",
 
