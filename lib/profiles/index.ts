@@ -1,4 +1,3 @@
-
 export type Social = {
   platform:
     | "facebook"
@@ -97,7 +96,8 @@ export type BusinessProfile = {
     | "suzuki-advisor"
     | "tamtech-wendell"
     | "pixeeplates"
-    | "ghie-larracas";
+    | "ghie-larracas"
+    | "calix-films";
 
   businessName: string;
   tagline?: string;
@@ -115,6 +115,9 @@ export type BusinessProfile = {
   locationUrl?: string;
   reviewUrl?: string;
   socials?: Social[];
+  businessSocials?: Social[];
+  packageBanners?: Record<string, string>;
+  featuredBanner?: string;
   bio?: string;
 
   services?: {
@@ -149,6 +152,7 @@ import tamtechWendell from "./business/tamtech-wendell";
 import pixeeplates from "./business/pixeeplates";
 import { suzukiAdvisorProfile } from "./business/suzuki-advisor";
 import { ghieLarracas } from "./business/ghie-larracas";
+import calixFilms from "./business/calix-films";
 
 const personalProfiles: PersonalProfile[] = [
   cel,
@@ -171,6 +175,7 @@ const businessProfiles: BusinessProfile[] = [
   tamtechWendell,
   ghieLarracas,
   pixeeplates,
+  calixFilms,
 ];
 
 export function getPersonalProfile(id: string) {

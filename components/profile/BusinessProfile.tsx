@@ -12,6 +12,7 @@ import SuzukiAdvisor from "./templates/suzuki-advisor/SuzukiAdvisor";
 import TamtechWendell from "./templates/tamtech-wendell/TamtechWendell";
 import PixeePlates from "./templates/PixeePlates/PixeePlates";
 import GhieLarracas from "./templates/GhieLarracas/GhieLarracas";
+import CalixFilms from "./templates/calix-films/CalixFilms";
 
 export default function BusinessProfile({
   profile,
@@ -54,6 +55,9 @@ export default function BusinessProfile({
 
     case "ghie-larracas":
       return <GhieLarracas profile={profile} />;
+
+    case "calix-films":
+      return <CalixFilms profile={profile} />;
 
     default:
       return <BusinessBanner profile={profile} />;
