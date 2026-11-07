@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -19,7 +20,6 @@ import type { BusinessProfile } from "@/lib/profiles";
 const focusRing =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D5FD1] focus-visible:ring-offset-2";
 
-// Boxy action buttons (square corners). The avatar stays round.
 const actionBase =
   "flex min-h-12 min-w-0 items-center justify-center gap-2 rounded-none border border-[#E3E8F0] bg-white px-3 py-3 text-sm font-semibold text-[#292929] transition hover:border-[#1D5FD1] hover:bg-[#F7F9FC] active:scale-[0.98]";
 
@@ -28,29 +28,112 @@ const disabledAction =
 
 const TAGLINE = "Serving the community with strength and stability";
 
+function escapeVCard(value: string) {
+  return value
+    .replace(/\\/g, "\\\\")
+    .replace(/\r\n|\n|\r/g, "\\n")
+    .replace(/,/g, "\\,")
+    .replace(/;/g, "\\;");
+}
+
+function getNameParts(name: string) {
+  const parts = name.trim().split(/\s+/);
+
+  if (parts.length === 1) {
+    return {
+      firstName: parts[0],
+      lastName: "",
+    };
+  }
+
+  return {
+    firstName: parts.slice(0, -1).join(" "),
+    lastName: parts[parts.length - 1],
+  };
+}
+
+async function getAvatarPhoto(avatar?: string) {
+  if (!avatar) return null;
+
+  try {
+    const response = await fetch(avatar, {
+      cache: "force-cache",
+    });
+
+    if (!response.ok) {
+      throw new Error("Unable to fetch profile photo.");
+    }
+
+    const blob = await response.blob();
+    const mimeType = blob.type.toLowerCase();
+
+    if (mimeType !== "image/jpeg" && mimeType !== "image/png") {
+      console.warn("Profile photo must be JPEG or PNG to embed in vCard.");
+      return null;
+    }
+
+    const base64 = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const result = reader.result;
+
+        if (typeof result !== "string") {
+          reject(new Error("Unable to read profile photo."));
+          return;
+        }
+
+        resolve(result.split(",")[1] ?? "");
+      };
+
+      reader.onerror = () => {
+        reject(new Error("Unable to read profile photo."));
+      };
+
+      reader.readAsDataURL(blob);
+    });
+
+    if (!base64) return null;
+
+    return {
+      base64,
+      type: mimeType === "image/png" ? "PNG" : "JPEG",
+    };
+  } catch (error) {
+    console.error("Unable to include profile photo:", error);
+    return null;
+  }
+}
+
 export default function Hero({ profile }: { profile: BusinessProfile }) {
   const [copied, setCopied] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
+
   const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(
     () => () => {
       if (copyTimer.current) clearTimeout(copyTimer.current);
+      if (saveTimer.current) clearTimeout(saveTimer.current);
     },
     [],
   );
 
-  const phone = profile.phone || "";
+  const phone = profile.phone?.trim() || "";
   const phoneHref = phone.replace(/[^\d+]/g, "");
-  const email = profile.email || "";
+  const email = profile.email?.trim() || "";
   const avatarSrc = profile.avatar || "";
-  const name = profile.contactName || profile.businessName;
+  const name = profile.contactName?.trim() || profile.businessName;
 
   // Normalize Philippine mobile numbers for Viber.
   const digits = phone.replace(/\D/g, "");
-  const normalizedDigits = digits.startsWith("00") ? digits.slice(2) : digits;
+  const normalizedDigits = digits.startsWith("00")
+    ? digits.slice(2)
+    : digits;
 
   const viberNumber = normalizedDigits.startsWith("63")
     ? normalizedDigits
@@ -60,57 +143,112 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
         ? `63${normalizedDigits}`
         : "";
 
-  const escapeVCard = (value: string) =>
-    value
-      .replace(/\\/g, "\\\\")
-      .replace(/\n/g, "\\n")
-      .replace(/,/g, "\\,")
-      .replace(/;/g, "\\;");
-
-  const handleSave = () => {
+  const handleSave = async () => {
     if (saving) return;
 
-    try {
-      setSaving(true);
-      setSaveError(false);
+    setSaving(true);
+    setSaved(false);
+    setSaveError(false);
 
-      const vcard = [
+    try {
+      const fullName = name.trim() || "Contact";
+      const { firstName, lastName } = getNameParts(fullName);
+
+      const businessName = profile.businessName?.trim() || "";
+      const title = profile.contactTitle?.trim() || "";
+      const location = profile.location?.trim() || "";
+      const locationUrl = profile.locationUrl?.trim() || "";
+
+      // Fetch the same avatar displayed in the profile.
+      const photo = await getAvatarPhoto(profile.avatar);
+
+      const lines = [
         "BEGIN:VCARD",
         "VERSION:3.0",
-        `FN:${escapeVCard(name)}`,
-        `ORG:${escapeVCard(profile.businessName)}`,
-        profile.contactTitle
-          ? `TITLE:${escapeVCard(profile.contactTitle)}`
-          : "",
-        phone ? `TEL;TYPE=CELL:${escapeVCard(phone)}` : "",
-        email ? `EMAIL;TYPE=INTERNET:${escapeVCard(email)}` : "",
-        profile.location
-          ? `ADR;TYPE=WORK:;;${escapeVCard(profile.location)};;;;`
-          : "",
-        profile.locationUrl ? `URL:${escapeVCard(profile.locationUrl)}` : "",
-        "END:VCARD",
-      ]
-        .filter(Boolean)
-        .join("\r\n");
+        `N:${escapeVCard(lastName)};${escapeVCard(firstName)};;;`,
+        `FN:${escapeVCard(fullName)}`,
+      ];
 
-      const blob = new Blob([vcard], { type: "text/vcard;charset=utf-8" });
+      if (businessName) {
+        lines.push(`ORG:${escapeVCard(businessName)}`);
+      }
+
+      if (title) {
+        lines.push(`TITLE:${escapeVCard(title)}`);
+      }
+
+      if (phone) {
+        lines.push(`TEL;TYPE=CELL,VOICE:${escapeVCard(phone)}`);
+      }
+
+      if (email) {
+        lines.push(`EMAIL;TYPE=INTERNET:${escapeVCard(email)}`);
+      }
+
+      if (location) {
+        lines.push(`ADR;TYPE=WORK:;;${escapeVCard(location)};;;;`);
+      }
+
+      // Include the map/location link.
+      if (locationUrl) {
+        lines.push(`URL:${escapeVCard(locationUrl)}`);
+      }
+
+      // Include all available social media links.
+      (profile.socials ?? []).forEach((social) => {
+        const socialUrl = social.url?.trim();
+
+        if (!socialUrl) return;
+
+        lines.push(`URL:${escapeVCard(socialUrl)}`);
+      });
+
+      // Embed the actual profile avatar, not the business logo or banner.
+      if (photo) {
+        lines.push(
+          `PHOTO;ENCODING=b;TYPE=${photo.type}:${photo.base64}`,
+        );
+      }
+
+      lines.push("END:VCARD");
+
+      const vcard = lines.join("\r\n") + "\r\n";
+
+      const blob = new Blob([vcard], {
+        type: "text/vcard;charset=utf-8",
+      });
+
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
 
+      const safeFilename = fullName
+        .replace(/[<>:"/\\|?*\x00-\x1F]/g, "")
+        .trim()
+        .replace(/\s+/g, "-");
+
       link.href = url;
-      link.download = `${name.trim().replace(/\s+/g, "-")}.vcf`;
+      link.download = `${safeFilename || "Contact"}.vcf`;
 
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
 
-      window.setTimeout(() => URL.revokeObjectURL(url), 1500);
+      window.setTimeout(() => {
+        URL.revokeObjectURL(url);
+      }, 2000);
+
+      setSaved(true);
+
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+
+      saveTimer.current = setTimeout(() => {
+        setSaved(false);
+      }, 3000);
     } catch (error) {
       console.error("Unable to save contact:", error);
       setSaveError(true);
     } finally {
-      // Keep the busy state visible long enough to register as feedback.
-      window.setTimeout(() => setSaving(false), 500);
+      setSaving(false);
     }
   };
 
@@ -129,8 +267,12 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
       } else {
         await navigator.clipboard.writeText(url);
         setCopied(true);
+
         if (copyTimer.current) clearTimeout(copyTimer.current);
-        copyTimer.current = setTimeout(() => setCopied(false), 2000);
+
+        copyTimer.current = setTimeout(() => {
+          setCopied(false);
+        }, 2000);
       }
     } catch (error) {
       if (error instanceof Error && error.name !== "AbortError") {
@@ -145,7 +287,7 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
       aria-labelledby="sbs-profile-name"
       className="relative mx-auto w-full overflow-hidden rounded-xl border border-[#E3E8F0] bg-white shadow-[0_18px_55px_rgba(0,0,0,0.07)]"
     >
-      {/* COVER PHOTO: image only, no text on the banner */}
+      {/* COVER PHOTO */}
       <div className="relative aspect-[2114/744] w-full overflow-hidden bg-[#E6EBF2] lg:aspect-auto lg:h-[340px]">
         {profile.banner ? (
           <Image
@@ -191,9 +333,11 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
               )}
             </div>
 
+            {/* GREEN ONLINE INDICATOR */}
             <span
-              aria-hidden="true"
-              className="absolute bottom-1 right-1 h-5 w-5 rounded-full border-[3px] border-white bg-[#F9B90F] sm:bottom-2 sm:right-2"
+              aria-label="Online"
+              title="Online"
+              className="absolute bottom-1 right-1 h-5 w-5 rounded-full border-[3px] border-white bg-[#22C55E] shadow-[0_0_0_2px_rgba(34,197,94,0.15)] sm:bottom-2 sm:right-2"
             />
           </div>
         </div>
@@ -244,8 +388,6 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
 
         {/* BUSINESS IDENTITY */}
         <div className="mx-auto mt-7 flex max-w-2xl items-center gap-4 border border-[#E3E8F0] bg-[#F7F9FC] p-3 sm:gap-5 sm:p-4">
-          {/* Logo box: the artwork has white side margins, so it is scaled up
-              inside an overflow-hidden frame to fill the box. */}
           <div className="relative aspect-square h-20 w-20 shrink-0 overflow-hidden rounded-none border border-[#E3E8F0] bg-white sm:h-28 sm:w-28">
             {profile.logo ? (
               <Image
@@ -274,9 +416,11 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
               />
               Official Business Profile
             </p>
+
             <h2 className="mt-1.5 text-base font-bold leading-snug text-[#171717] sm:text-lg">
               {profile.businessName}
             </h2>
+
             <p className="mt-0.5 text-xs text-[#5B6575] sm:text-sm">
               Professional Banking
             </p>
@@ -297,6 +441,12 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
                 aria-hidden="true"
                 className="animate-spin"
               />
+            ) : saved ? (
+              <Check
+                size={19}
+                aria-hidden="true"
+                className="text-[#22C55E]"
+              />
             ) : (
               <UserPlus
                 size={19}
@@ -304,7 +454,12 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
                 className="text-[#F9B90F] transition-transform group-hover:scale-110"
               />
             )}
-            {saving ? "Preparing Contact..." : "Save Contact"}
+
+            {saving
+              ? "Preparing Contact..."
+              : saved
+                ? "Contact Downloaded"
+                : "Save Contact"}
           </button>
 
           {saveError && (
@@ -318,7 +473,10 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
 
           <div className="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-4 sm:gap-3">
             {phoneHref ? (
-              <a href={`tel:${phoneHref}`} className={`${actionBase} ${focusRing}`}>
+              <a
+                href={`tel:${phoneHref}`}
+                className={`${actionBase} ${focusRing}`}
+              >
                 <Phone
                   size={16}
                   aria-hidden="true"
@@ -328,13 +486,20 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
               </a>
             ) : (
               <span aria-disabled="true" className={disabledAction}>
-                <Phone size={16} aria-hidden="true" className="shrink-0 text-[#1D5FD1]" />
+                <Phone
+                  size={16}
+                  aria-hidden="true"
+                  className="shrink-0 text-[#1D5FD1]"
+                />
                 Call
               </span>
             )}
 
             {email ? (
-              <a href={`mailto:${email}`} className={`${actionBase} ${focusRing}`}>
+              <a
+                href={`mailto:${email}`}
+                className={`${actionBase} ${focusRing}`}
+              >
                 <Mail
                   size={16}
                   aria-hidden="true"
@@ -344,7 +509,11 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
               </a>
             ) : (
               <span aria-disabled="true" className={disabledAction}>
-                <Mail size={16} aria-hidden="true" className="shrink-0 text-[#1D5FD1]" />
+                <Mail
+                  size={16}
+                  aria-hidden="true"
+                  className="shrink-0 text-[#1D5FD1]"
+                />
                 Email
               </span>
             )}
@@ -363,7 +532,11 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
               </a>
             ) : (
               <span aria-disabled="true" className={disabledAction}>
-                <FaViber size={17} aria-hidden="true" className="shrink-0 text-[#7360bd]" />
+                <FaViber
+                  size={17}
+                  aria-hidden="true"
+                  className="shrink-0 text-[#7360bd]"
+                />
                 Viber
               </span>
             )}
