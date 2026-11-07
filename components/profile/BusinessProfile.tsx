@@ -13,6 +13,7 @@ import TamtechWendell from "./templates/tamtech-wendell/TamtechWendell";
 import PixeePlates from "./templates/PixeePlates/PixeePlates";
 import GhieLarracas from "./templates/GhieLarracas/GhieLarracas";
 import CalixFilms from "./templates/calix-films/CalixFilms";
+import RbsGhie from "./templates/rbs-Ghie/RbsGhie";
 
 export default function BusinessProfile({
   profile,
@@ -58,6 +59,9 @@ export default function BusinessProfile({
 
     case "calix-films":
       return <CalixFilms profile={profile} />;
+
+    case "rbs-ghie":
+      return <RbsGhie profile={profile} />;
 
     default:
       return <BusinessBanner profile={profile} />;

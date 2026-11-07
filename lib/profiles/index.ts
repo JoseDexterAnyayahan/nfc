@@ -97,7 +97,8 @@ export type BusinessProfile = {
     | "tamtech-wendell"
     | "pixeeplates"
     | "ghie-larracas"
-    | "calix-films";
+    | "calix-films"
+    | "rbs-ghie";
 
   businessName: string;
   tagline?: string;
@@ -153,6 +154,7 @@ import pixeeplates from "./business/pixeeplates";
 import { suzukiAdvisorProfile } from "./business/suzuki-advisor";
 import { ghieLarracas } from "./business/ghie-larracas";
 import calixFilms from "./business/calix-films";
+import rbsGhie from "./business/rbs-Ghie";
 
 const personalProfiles: PersonalProfile[] = [
   cel,
@@ -176,6 +178,7 @@ const businessProfiles: BusinessProfile[] = [
   ghieLarracas,
   pixeeplates,
   calixFilms,
+  rbsGhie,
 ];
 
 export function getPersonalProfile(id: string) {
