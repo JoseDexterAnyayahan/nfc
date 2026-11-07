@@ -13,6 +13,7 @@ import {
   FaShareNodes,
 } from "react-icons/fa6";
 import SocialLinks from "./SocialLinks";
+import { UserPlus } from "lucide-react";
 
 type Props = {
   profile: BusinessProfile;
@@ -444,7 +445,7 @@ export default function Hero({ profile }: Props) {
               disabled={saving}
               className={`${primaryAction} col-span-3 disabled:cursor-wait disabled:opacity-70 sm:col-span-1 ${focusRing}`}
             >
-              <FaAddressCard aria-hidden="true" />
+              <UserPlus aria-hidden="true" />
               {saving ? "Preparing..." : "Save Contact"}
             </button>
 

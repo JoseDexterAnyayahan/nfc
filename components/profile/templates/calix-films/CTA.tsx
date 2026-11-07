@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { BusinessProfile } from "@/lib/profiles";
 import { FaAddressBook, FaEnvelope, FaPhone } from "react-icons/fa6";
+import { UserPlus } from "lucide-react";
 
 type Props = {
   profile: BusinessProfile;
@@ -304,7 +305,7 @@ export default function CTA({ profile }: Props) {
             disabled={saving}
             className={`${primaryAction} ${focusRing} disabled:cursor-wait disabled:opacity-70`}
           >
-            <FaAddressBook aria-hidden="true" size={17} />
+            <UserPlus aria-hidden="true" size={17} />
 
             {saving ? "Preparing Contact..." : "Save Contact"}
           </button>
