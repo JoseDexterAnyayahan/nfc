@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type { BusinessProfile } from "@/lib/profiles";
 import { FaAddressBook, FaEnvelope, FaPhone } from "react-icons/fa6";
 
@@ -15,7 +18,119 @@ const primaryAction = `${actionBase} border-[#D6B779] bg-gradient-to-r from-[#B8
 
 const secondaryAction = `${actionBase} border-[#D6B779]/50 bg-[#D6B779]/5 text-[#E5CD91] hover:border-[#E5CD91] hover:bg-[#D6B779]/15`;
 
+function escapeVCard(value: string) {
+  return value
+    .replace(/\\/g, "\\\\")
+    .replace(/\r?\n/g, "\\n")
+    .replace(/,/g, "\\,")
+    .replace(/;/g, "\\;");
+}
+
+function foldVCardLine(line: string) {
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(line);
+
+  if (bytes.length <= 75) {
+    return line;
+  }
+
+  const parts: string[] = [];
+  let current = "";
+  let currentBytes = 0;
+
+  for (const char of line) {
+    const charBytes = encoder.encode(char).length;
+
+    if (currentBytes + charBytes > 75) {
+      parts.push(current);
+      current = ` ${char}`;
+      currentBytes = 1 + charBytes;
+    } else {
+      current += char;
+      currentBytes += charBytes;
+    }
+  }
+
+  if (current) {
+    parts.push(current);
+  }
+
+  return parts.join("\r\n");
+}
+
+async function prepareContactPhoto(blob: Blob) {
+  const type = blob.type.toLowerCase();
+
+  if (type === "image/jpeg" || type === "image/png") {
+    return {
+      blob,
+      type: type === "image/png" ? "PNG" : "JPEG",
+    };
+  }
+
+  const bitmap = await createImageBitmap(blob);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = bitmap.width;
+  canvas.height = bitmap.height;
+
+  const context = canvas.getContext("2d");
+
+  if (!context) {
+    bitmap.close();
+    throw new Error("Unable to prepare contact photo.");
+  }
+
+  context.drawImage(bitmap, 0, 0);
+  bitmap.close();
+
+  const jpegBlob = await new Promise<Blob | null>((resolve) => {
+    canvas.toBlob(resolve, "image/jpeg", 0.92);
+  });
+
+  if (!jpegBlob) {
+    throw new Error("Unable to convert contact photo.");
+  }
+
+  return {
+    blob: jpegBlob,
+    type: "JPEG",
+  };
+}
+
+function blobToBase64(blob: Blob) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const result = reader.result;
+
+      if (typeof result !== "string") {
+        reject(new Error("Unable to read contact photo."));
+        return;
+      }
+
+      const base64 = result.split(",")[1];
+
+      if (!base64) {
+        reject(new Error("Unable to encode contact photo."));
+        return;
+      }
+
+      resolve(base64);
+    };
+
+    reader.onerror = () => {
+      reject(new Error("Unable to read contact photo."));
+    };
+
+    reader.readAsDataURL(blob);
+  });
+}
+
 export default function CTA({ profile }: Props) {
+  const [saving, setSaving] = useState(false);
+
   const phone = profile.phone?.trim() ?? "";
   const email = profile.email?.trim() ?? "";
 
@@ -25,19 +140,103 @@ export default function CTA({ profile }: Props) {
     ? `63${digits.slice(1)}`
     : digits;
 
-  const contactName = profile.contactName?.trim() || profile.businessName;
+  const contactName =
+    profile.contactName?.trim() || profile.businessName;
 
-  const vCard = [
-    "BEGIN:VCARD",
-    "VERSION:3.0",
-    `FN:${contactName}`,
-    `ORG:${profile.businessName}`,
-    ...(internationalPhone ? [`TEL;TYPE=CELL:+${internationalPhone}`] : []),
-    ...(email ? [`EMAIL:${email}`] : []),
-    "END:VCARD",
-  ].join("\r\n");
+  const saveContact = async () => {
+    if (saving) return;
 
-  const contactFile = `data:text/vcard;charset=utf-8,${encodeURIComponent(vCard)}`;
+    setSaving(true);
+
+    try {
+      let photoBase64 = "";
+      let photoType = "JPEG";
+
+      if (profile.avatar) {
+        const response = await fetch(profile.avatar, {
+          cache: "force-cache",
+        });
+
+        if (!response.ok) {
+          throw new Error("Unable to load contact photo.");
+        }
+
+        const blob = await response.blob();
+
+        if (!blob.type.toLowerCase().startsWith("image/")) {
+          throw new Error("Contact photo is not a valid image.");
+        }
+
+        const preparedPhoto = await prepareContactPhoto(blob);
+
+        photoType = preparedPhoto.type;
+        photoBase64 = await blobToBase64(preparedPhoto.blob);
+      }
+
+      const currentUrl = window.location.href;
+
+      const vCardLines = [
+        "BEGIN:VCARD",
+        "VERSION:3.0",
+        `FN:${escapeVCard(contactName)}`,
+        `ORG:${escapeVCard(profile.businessName)}`,
+        ...(profile.tagline
+          ? [`TITLE:${escapeVCard(profile.tagline)}`]
+          : []),
+        ...(internationalPhone
+          ? [`TEL;TYPE=CELL:+${internationalPhone}`]
+          : []),
+        ...(email
+          ? [`EMAIL;TYPE=WORK:${escapeVCard(email)}`]
+          : []),
+        ...(profile.location
+          ? [
+              `ADR;TYPE=WORK:;;${escapeVCard(
+                profile.location,
+              )};;;;`,
+            ]
+          : []),
+        `URL:${currentUrl}`,
+        ...(photoBase64
+          ? [
+              `PHOTO;ENCODING=b;TYPE=${photoType}:${photoBase64}`,
+            ]
+          : []),
+        "END:VCARD",
+      ];
+
+      const vCard = vCardLines
+        .map(foldVCardLine)
+        .join("\r\n");
+
+      const blob = new Blob([vCard], {
+        type: "text/vcard;charset=utf-8",
+      });
+
+      const fileName = `${profile.businessName
+        .replace(/[^a-z0-9]/gi, "-")
+        .toLowerCase()}.vcf`;
+
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Save contact failed:", error);
+
+      window.alert(
+        "Unable to save the contact right now. Please try again.",
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <section
@@ -64,9 +263,11 @@ export default function CTA({ profile }: Props) {
       <div className="relative mx-auto max-w-3xl">
         <div className="mb-7 flex items-center justify-center gap-3">
           <span className="h-px w-10 bg-gradient-to-r from-transparent to-[#D6B779]" />
+
           <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#E5CD91] sm:text-xs sm:tracking-[0.35em]">
-            Let's create something memorable
+            Let&apos;s create something memorable
           </p>
+
           <span className="h-px w-10 bg-gradient-to-l from-transparent to-[#D6B779]" />
         </div>
 
@@ -85,7 +286,9 @@ export default function CTA({ profile }: Props) {
           className="mx-auto mt-7 flex items-center justify-center gap-2"
         >
           <span className="h-px w-12 bg-gradient-to-r from-transparent to-[#B89553]" />
+
           <span className="h-2 w-2 rotate-45 border border-[#E5CD91] bg-[#B89553]" />
+
           <span className="h-px w-12 bg-gradient-to-l from-transparent to-[#B89553]" />
         </div>
 
@@ -95,14 +298,16 @@ export default function CTA({ profile }: Props) {
         </p>
 
         <div className="mx-auto mt-10 flex max-w-sm flex-col items-stretch gap-3 sm:max-w-none sm:flex-row sm:flex-wrap sm:justify-center">
-          <a
-            href={contactFile}
-            download={`${profile.businessName.replace(/[^a-z0-9]/gi, "-").toLowerCase()}.vcf`}
-            className={`${primaryAction} ${focusRing}`}
+          <button
+            type="button"
+            onClick={saveContact}
+            disabled={saving}
+            className={`${primaryAction} ${focusRing} disabled:cursor-wait disabled:opacity-70`}
           >
             <FaAddressBook aria-hidden="true" size={17} />
-            Save Contact
-          </a>
+
+            {saving ? "Preparing Contact..." : "Save Contact"}
+          </button>
 
           {digits && (
             <a

@@ -13,7 +13,7 @@ const calixFilms: BusinessProfile = {
 
   // Main profile picture. Replace with a photo of James when available;
   // the business logo then appears as a badge on its corner.
-  avatar: "/profiles/business/calix/profile.png",
+  avatar: "/profiles/business/calix/calix-photo.jpg",
 
   // Business logo, shown as the badge on the avatar
   logo: "/profiles/business/calix/logo.png",

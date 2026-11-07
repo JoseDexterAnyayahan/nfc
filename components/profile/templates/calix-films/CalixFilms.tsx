@@ -2,12 +2,12 @@ import { Poppins } from "next/font/google";
 import type { BusinessProfile } from "@/lib/profiles";
 
 import Hero from "./Hero";
-import About from "./About";
 import Featured from "./Featured";
 import Packages from "./Packages";
 import Location from "./Location";
 import CTA from "./CTA";
 import Footer from "./Footer";
+import FloatingActions from "./FloatingActions";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -28,6 +28,7 @@ export default function CalixFilms({ profile }: Props) {
       <Location profile={profile} />
       <CTA profile={profile} />
       <Footer profile={profile} />
+      <FloatingActions profile={profile} />
     </main>
   );
 }
