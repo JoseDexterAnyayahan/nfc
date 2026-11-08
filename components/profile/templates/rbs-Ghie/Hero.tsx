@@ -427,7 +427,7 @@ export default function Hero({
                 alt={`${profile.businessName} logo`}
                 fill
                 sizes="(max-width: 640px) 80px, 112px"
-                className="scale-110 object-contain p-1"
+                className="scale-115 object-contain p-1"
               />
             ) : (
               <span
