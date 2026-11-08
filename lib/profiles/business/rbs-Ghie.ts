@@ -10,7 +10,7 @@ export const sbsGhie: BusinessProfile = {
   tagline: "Professional Banking. Personal Connection.",
 
   logo: "/profiles/business/rbs-ghie/rbs-logo.png",
-  banner: "/profiles/business/rbs-ghie/rbs-banner.png",
+  banner: "/profiles/business/rbs-ghie/rbs-cover.png",
 
   // Reusing her existing profile photograph.
   avatar:

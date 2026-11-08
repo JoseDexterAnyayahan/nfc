@@ -36,7 +36,11 @@ const pillars = [
 const focusRing =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D5FD1] focus-visible:ring-offset-2";
 
-export default function About({ profile }: { profile: BusinessProfile }) {
+export default function About({
+  profile,
+}: {
+  profile: BusinessProfile;
+}) {
   const name = profile.contactName || "Management Representative";
   const title = profile.contactTitle || "General Manager";
 
@@ -50,16 +54,42 @@ export default function About({ profile }: { profile: BusinessProfile }) {
         {/* VISUAL / BANK IDENTITY */}
         <div className="relative">
           <div className="relative flex h-full flex-col overflow-hidden border border-[#E3E8F0] bg-white shadow-[0_16px_45px_rgba(15,35,65,0.08)]">
-            {/* Image */}
-            <div className="relative min-h-[320px] flex-1 overflow-hidden bg-[#000000] sm:min-h-[420px]">
+            {/* Image / Bank Identity */}
+            <div className="relative min-h-[380px] flex-1 overflow-hidden bg-[#07111F] sm:min-h-[480px]">
               {profile.logo ? (
-                <Image
-                  src={profile.logo}
-                  alt=""
-                  fill
-                 sizes="(max-width: 640px) 80px, 112px"
-                className="scale-[1] object-contain"
-                />
+                <>
+                  {/* Background atmosphere */}
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(29,95,209,0.18),transparent_55%)]"
+                  />
+
+                  {/* Large centered circular logo */}
+                  <div className="absolute inset-0 flex items-center justify-center px-8 pb-32 sm:px-12 sm:pb-36">
+                    <div className="relative flex h-48 w-48 items-center justify-center rounded-full border-[8px] border-white/95 bg-white shadow-[0_20px_55px_rgba(0,0,0,0.28)] sm:h-60 sm:w-60 sm:border-[10px]">
+                      <div className="relative h-full w-full overflow-hidden rounded-full">
+                        <Image
+                          src={profile.logo}
+                          alt={`${profile.businessName} logo`}
+                          fill
+                          sizes="(max-width: 640px) 192px, 240px"
+                           className="scale-130 p-4 sm:p-5"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Subtle blue/gold decorative rings */}
+                  <div
+                    aria-hidden="true"
+                    className="absolute left-1/2 top-1/2 h-[300px] w-[300px] -translate-x-1/2 -translate-y-[58%] rounded-full border border-white/10 sm:h-[380px] sm:w-[380px]"
+                  />
+
+                  <div
+                    aria-hidden="true"
+                    className="absolute left-1/2 top-1/2 h-[360px] w-[360px] -translate-x-1/2 -translate-y-[58%] rounded-full border border-[#F9B90F]/10 sm:h-[460px] sm:w-[460px]"
+                  />
+                </>
               ) : (
                 <div
                   aria-hidden="true"
@@ -67,9 +97,10 @@ export default function About({ profile }: { profile: BusinessProfile }) {
                 />
               )}
 
+              {/* Dark gradient for text readability */}
               <div
                 aria-hidden="true"
-                className="absolute inset-0 bg-gradient-to-t from-[#101D35]/95 via-[#101D35]/35 to-transparent"
+                className="absolute inset-0 bg-gradient-to-t from-[#101D35] via-[#101D35]/35 to-transparent"
               />
 
               {/* Bank identity overlay */}
@@ -100,23 +131,28 @@ export default function About({ profile }: { profile: BusinessProfile }) {
               </div>
             </div>
 
-            {/* Values strip, taken from the tagline */}
+            {/* Values strip */}
             <ul className="grid grid-cols-1 divide-y divide-[#E3E8F0] border-t border-[#E3E8F0] bg-white sm:grid-cols-3 sm:divide-x sm:divide-y-0">
               {pillars.map((pillar) => {
                 const Icon = pillar.icon;
 
                 return (
-                  <li key={pillar.label} className="flex items-start gap-3 p-4 sm:flex-col sm:gap-2 sm:p-5">
+                  <li
+                    key={pillar.label}
+                    className="flex items-start gap-3 p-4 sm:flex-col sm:gap-2 sm:p-5"
+                  >
                     <Icon
                       size={20}
                       strokeWidth={1.8}
                       aria-hidden="true"
                       className="mt-0.5 shrink-0 text-[#1D5FD1]"
                     />
+
                     <div className="min-w-0">
                       <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#0B4FA8]">
                         {pillar.label}
                       </p>
+
                       <p className="mt-1 text-sm leading-6 text-[#5B6575]">
                         {pillar.text}
                       </p>
@@ -141,6 +177,7 @@ export default function About({ profile }: { profile: BusinessProfile }) {
               aria-hidden="true"
               className="h-[2px] w-9 bg-[#F9B90F]"
             />
+
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#0B4FA8]">
               About the Bank
             </p>
@@ -166,6 +203,7 @@ export default function About({ profile }: { profile: BusinessProfile }) {
 
           {/* HIGHLIGHTS */}
           <ul className="mt-8 space-y-3">
+            {/* Leadership */}
             <li className="flex items-start gap-4 border border-[#E3E8F0] bg-white p-4 shadow-[0_5px_18px_rgba(15,35,65,0.035)] transition hover:border-[#1D5FD1] sm:p-5">
               <span
                 aria-hidden="true"
@@ -178,13 +216,18 @@ export default function About({ profile }: { profile: BusinessProfile }) {
                 <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#0B4FA8]">
                   Leadership
                 </p>
+
                 <p className="mt-1 text-base font-bold text-[#171717]">
                   {name}
                 </p>
-                <p className="mt-0.5 text-sm text-[#5B6575]">{title}</p>
+
+                <p className="mt-0.5 text-sm text-[#5B6575]">
+                  {title}
+                </p>
               </div>
             </li>
 
+            {/* Location */}
             {profile.location && (
               <li className="flex items-start gap-4 border border-[#E3E8F0] bg-white p-4 shadow-[0_5px_18px_rgba(15,35,65,0.035)] transition hover:border-[#1D5FD1] sm:p-5">
                 <span
@@ -198,6 +241,7 @@ export default function About({ profile }: { profile: BusinessProfile }) {
                   <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#0B4FA8]">
                     Where We Serve
                   </p>
+
                   <p className="mt-1 break-words text-base font-bold text-[#171717]">
                     {profile.location}
                   </p>
@@ -205,6 +249,7 @@ export default function About({ profile }: { profile: BusinessProfile }) {
               </li>
             )}
 
+            {/* Promise */}
             <li className="flex items-start gap-4 border border-[#E3E8F0] bg-white p-4 shadow-[0_5px_18px_rgba(15,35,65,0.035)] transition hover:border-[#1D5FD1] sm:p-5">
               <span
                 aria-hidden="true"
@@ -217,6 +262,7 @@ export default function About({ profile }: { profile: BusinessProfile }) {
                 <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#0B4FA8]">
                   Our Promise
                 </p>
+
                 <p className="mt-1 text-base font-bold text-[#171717]">
                   Professional Banking. Personal Connection.
                 </p>
@@ -230,6 +276,7 @@ export default function About({ profile }: { profile: BusinessProfile }) {
             className={`group mt-8 inline-flex min-h-12 w-full items-center justify-center gap-3 self-start rounded-none border border-[#171717] bg-[#171717] px-6 py-3 text-sm font-semibold text-white transition hover:border-[#0B4FA8] hover:bg-[#0B4FA8] sm:w-auto ${focusRing}`}
           >
             Connect With Me
+
             <ArrowUpRight
               size={17}
               aria-hidden="true"

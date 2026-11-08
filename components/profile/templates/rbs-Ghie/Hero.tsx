@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from "next/image";
@@ -68,7 +67,10 @@ async function getAvatarPhoto(avatar?: string) {
     const mimeType = blob.type.toLowerCase();
 
     if (mimeType !== "image/jpeg" && mimeType !== "image/png") {
-      console.warn("Profile photo must be JPEG or PNG to embed in vCard.");
+      console.warn(
+        "Profile photo must be JPEG or PNG to embed in vCard.",
+      );
+
       return null;
     }
 
@@ -105,7 +107,11 @@ async function getAvatarPhoto(avatar?: string) {
   }
 }
 
-export default function Hero({ profile }: { profile: BusinessProfile }) {
+export default function Hero({
+  profile,
+}: {
+  profile: BusinessProfile;
+}) {
   const [copied, setCopied] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -131,6 +137,7 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
 
   // Normalize Philippine mobile numbers for Viber.
   const digits = phone.replace(/\D/g, "");
+
   const normalizedDigits = digits.startsWith("00")
     ? digits.slice(2)
     : digits;
@@ -139,7 +146,8 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
     ? normalizedDigits
     : normalizedDigits.startsWith("0")
       ? `63${normalizedDigits.slice(1)}`
-      : normalizedDigits.length === 10 && normalizedDigits.startsWith("9")
+      : normalizedDigits.length === 10 &&
+          normalizedDigits.startsWith("9")
         ? `63${normalizedDigits}`
         : "";
 
@@ -178,15 +186,21 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
       }
 
       if (phone) {
-        lines.push(`TEL;TYPE=CELL,VOICE:${escapeVCard(phone)}`);
+        lines.push(
+          `TEL;TYPE=CELL,VOICE:${escapeVCard(phone)}`,
+        );
       }
 
       if (email) {
-        lines.push(`EMAIL;TYPE=INTERNET:${escapeVCard(email)}`);
+        lines.push(
+          `EMAIL;TYPE=INTERNET:${escapeVCard(email)}`,
+        );
       }
 
       if (location) {
-        lines.push(`ADR;TYPE=WORK:;;${escapeVCard(location)};;;;`);
+        lines.push(
+          `ADR;TYPE=WORK:;;${escapeVCard(location)};;;;`,
+        );
       }
 
       // Include the map/location link.
@@ -239,7 +253,9 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
 
       setSaved(true);
 
-      if (saveTimer.current) clearTimeout(saveTimer.current);
+      if (saveTimer.current) {
+        clearTimeout(saveTimer.current);
+      }
 
       saveTimer.current = setTimeout(() => {
         setSaved(false);
@@ -268,14 +284,19 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
         await navigator.clipboard.writeText(url);
         setCopied(true);
 
-        if (copyTimer.current) clearTimeout(copyTimer.current);
+        if (copyTimer.current) {
+          clearTimeout(copyTimer.current);
+        }
 
         copyTimer.current = setTimeout(() => {
           setCopied(false);
         }, 2000);
       }
     } catch (error) {
-      if (error instanceof Error && error.name !== "AbortError") {
+      if (
+        error instanceof Error &&
+        error.name !== "AbortError"
+      ) {
         console.error("Unable to share:", error);
       }
     }
@@ -367,8 +388,14 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
           {profile.location && (
             <a
               href={profile.locationUrl || "#contact"}
-              target={profile.locationUrl ? "_blank" : undefined}
-              rel={profile.locationUrl ? "noopener noreferrer" : undefined}
+              target={
+                profile.locationUrl ? "_blank" : undefined
+              }
+              rel={
+                profile.locationUrl
+                  ? "noopener noreferrer"
+                  : undefined
+              }
               className={`mt-4 inline-flex max-w-full items-start justify-center gap-2 rounded-sm text-sm font-medium text-[#5B6575] transition hover:text-[#0B4FA8] ${focusRing}`}
             >
               <MapPin
@@ -376,11 +403,15 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
                 aria-hidden="true"
                 className="mt-0.5 shrink-0 text-[#1D5FD1]"
               />
+
               <span className="min-w-0 break-words text-left">
                 {profile.location}
               </span>
+
               {profile.locationUrl && (
-                <span className="sr-only">(opens in a new tab)</span>
+                <span className="sr-only">
+                  (opens in a new tab)
+                </span>
               )}
             </a>
           )}
@@ -388,14 +419,15 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
 
         {/* BUSINESS IDENTITY */}
         <div className="mx-auto mt-7 flex max-w-2xl items-center gap-4 border border-[#E3E8F0] bg-[#F7F9FC] p-3 sm:gap-5 sm:p-4">
-          <div className="relative aspect-square h-20 w-20 shrink-0 overflow-hidden rounded-none border border-[#E3E8F0] bg-white sm:h-28 sm:w-28">
+          {/* ROUND BUSINESS LOGO */}
+          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border-2 border-white bg-white shadow-[0_4px_16px_rgba(0,0,0,0.08)] sm:h-28 sm:w-28">
             {profile.logo ? (
               <Image
                 src={profile.logo}
                 alt={`${profile.businessName} logo`}
                 fill
                 sizes="(max-width: 640px) 80px, 112px"
-                className="scale-[1] object-contain"
+                className="scale-110 object-contain p-1"
               />
             ) : (
               <span
@@ -485,7 +517,10 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
                 Call
               </a>
             ) : (
-              <span aria-disabled="true" className={disabledAction}>
+              <span
+                aria-disabled="true"
+                className={disabledAction}
+              >
                 <Phone
                   size={16}
                   aria-hidden="true"
@@ -508,7 +543,10 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
                 Email
               </a>
             ) : (
-              <span aria-disabled="true" className={disabledAction}>
+              <span
+                aria-disabled="true"
+                className={disabledAction}
+              >
                 <Mail
                   size={16}
                   aria-hidden="true"
@@ -531,7 +569,10 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
                 Viber
               </a>
             ) : (
-              <span aria-disabled="true" className={disabledAction}>
+              <span
+                aria-disabled="true"
+                className={disabledAction}
+              >
                 <FaViber
                   size={17}
                   aria-hidden="true"
@@ -559,12 +600,19 @@ export default function Hero({ profile }: { profile: BusinessProfile }) {
                   className="shrink-0 text-[#1D5FD1]"
                 />
               )}
+
               {copied ? "Copied" : "Share"}
             </button>
           </div>
 
-          <p className="sr-only" role="status" aria-live="polite">
-            {copied ? "Profile link copied to clipboard" : ""}
+          <p
+            className="sr-only"
+            role="status"
+            aria-live="polite"
+          >
+            {copied
+              ? "Profile link copied to clipboard"
+              : ""}
           </p>
         </div>
 
