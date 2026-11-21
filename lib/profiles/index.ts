@@ -101,6 +101,7 @@ export type BusinessProfile = {
     | "rbs-ben"
     | "rbs-fritzi"
     | "rbs-leizel"
+    | "rbs-chona"
     | "rbs-ghie";
 
   businessName: string;
@@ -161,6 +162,7 @@ import rbsGhie from "./business/rbs-Ghie";
 import rbsBen from "./business/rbs-Ben";
 import rbsFritzi from "./business/rbs-Fritzi";
 import rbsLeizel from "./business/rbs-Leizel";
+import rbsChona from "./business/rbs-Chona";
 
 const personalProfiles: PersonalProfile[] = [
   cel,
@@ -187,6 +189,7 @@ const businessProfiles: BusinessProfile[] = [
   rbsGhie,
   rbsFritzi,
   rbsLeizel,
+  rbsChona,
   rbsBen,
 ];
 

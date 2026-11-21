@@ -17,6 +17,7 @@ import RbsGhie from "./templates/rbs-Ghie/RbsGhie";
 import RbsBen from "./templates/rbs-Ben/RbsBen";
 import RbsFritzi from "./templates/rbs-Fritzi/RbsFritzi";
 import RbsLeizel from "./templates/rbs-Leizel/RbsLeizel";
+import RbsChona from "./templates/rbs-Chona/RbsChona";
 
 export default function BusinessProfile({
   profile,
@@ -74,6 +75,9 @@ export default function BusinessProfile({
 
     case "rbs-leizel":
       return <RbsLeizel profile={profile} />;
+
+    case "rbs-chona":
+      return <RbsChona profile={profile} />;
 
     default:
       return <BusinessBanner profile={profile} />;
