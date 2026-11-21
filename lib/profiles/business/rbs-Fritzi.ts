@@ -5,7 +5,7 @@ export const sbsFritzi: BusinessProfile = {
   type: "business",
   template: "rbs-fritzi",
 
-  businessName: "Rural Bank of Socorro - Gloria Branch",
+  businessName: "Rural Bank of Socorro - Pinamalayan Branch",
   tagline: "Professional Banking. Personal Connection.",
 
   logo: "/profiles/business/rbs-ghie/rbs-logo.png",
@@ -19,9 +19,9 @@ export const sbsFritzi: BusinessProfile = {
   phone: "09930757902",
   email: "rbs.operationshead@gmail.com",
 
-  location: "Rural Bank of Socorro - Gloria Branch",
+  location: "Rural Bank of Socorro - Pinamalayan Branch",
   locationUrl:
-    "https://maps.app.goo.gl/rmXggFZwFqJBLL6a9",
+    "https://maps.app.goo.gl/oBjw52Q5HoMKw8xx8",
 
   socials: [
     {
