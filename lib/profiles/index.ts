@@ -99,6 +99,7 @@ export type BusinessProfile = {
     | "ghie-larracas"
     | "calix-films"
     | "rbs-ben"
+    | "rbs-fritzi"
     | "rbs-ghie";
 
   businessName: string;
@@ -157,7 +158,7 @@ import { ghieLarracas } from "./business/ghie-larracas";
 import calixFilms from "./business/calix-films";
 import rbsGhie from "./business/rbs-Ghie";
 import rbsBen from "./business/rbs-Ben";
-
+import rbsFritzi from "./business/rbs-Fritzi";
 
 const personalProfiles: PersonalProfile[] = [
   cel,
@@ -182,7 +183,8 @@ const businessProfiles: BusinessProfile[] = [
   pixeeplates,
   calixFilms,
   rbsGhie,
-  rbsBen, 
+  rbsFritzi,
+  rbsBen,
 ];
 
 export function getPersonalProfile(id: string) {

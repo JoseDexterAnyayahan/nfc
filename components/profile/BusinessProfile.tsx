@@ -15,6 +15,7 @@ import GhieLarracas from "./templates/GhieLarracas/GhieLarracas";
 import CalixFilms from "./templates/calix-films/CalixFilms";
 import RbsGhie from "./templates/rbs-Ghie/RbsGhie";
 import RbsBen from "./templates/rbs-Ben/RbsBen";
+import RbsFritzi from "./templates/rbs-Fritzi/RbsFritzi";
 
 export default function BusinessProfile({
   profile,
@@ -66,6 +67,9 @@ export default function BusinessProfile({
 
     case "rbs-ben":
       return <RbsBen profile={profile} />;
+
+    case "rbs-fritzi":
+      return <RbsFritzi profile={profile} />;
 
     default:
       return <BusinessBanner profile={profile} />;
