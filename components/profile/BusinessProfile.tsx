@@ -16,6 +16,7 @@ import CalixFilms from "./templates/calix-films/CalixFilms";
 import RbsGhie from "./templates/rbs-Ghie/RbsGhie";
 import RbsBen from "./templates/rbs-Ben/RbsBen";
 import RbsFritzi from "./templates/rbs-Fritzi/RbsFritzi";
+import RbsLeizel from "./templates/rbs-Leizel/RbsLeizel";
 
 export default function BusinessProfile({
   profile,
@@ -70,6 +71,9 @@ export default function BusinessProfile({
 
     case "rbs-fritzi":
       return <RbsFritzi profile={profile} />;
+
+    case "rbs-leizel":
+      return <RbsLeizel profile={profile} />;
 
     default:
       return <BusinessBanner profile={profile} />;
